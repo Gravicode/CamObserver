@@ -29,6 +29,7 @@ namespace CamObserver.UWP
                 AppConstants.Gateway = localSettings.Values[LocalSettingName.Gateway] as string;
                 AppConstants.Lokasi = localSettings.Values[LocalSettingName.Lokasi] as string;
                 AppConstants.GrpcUrl = localSettings.Values[LocalSettingName.GrpcUrl] as string;
+                AppConstants.CCTV = localSettings.Values[LocalSettingName.CCTV] as string;
                 AppConstants.Cctv1 = localSettings.Values[LocalSettingName.Cctv1] as string;
                 AppConstants.CctvHttp = localSettings.Values[LocalSettingName.Cctv2] as string;
                 AppConstants.Username = localSettings.Values[LocalSettingName.Username] as string;
@@ -46,6 +47,7 @@ namespace CamObserver.UWP
             // Save a setting locally on the device
             localSettings.Values[LocalSettingName.Gateway] = AppConstants.Gateway;
             localSettings.Values[LocalSettingName.Lokasi] = AppConstants.Lokasi;
+            localSettings.Values[LocalSettingName.CCTV] = AppConstants.CCTV;
             localSettings.Values[LocalSettingName.Cctv1] = AppConstants.Cctv1;
             localSettings.Values[LocalSettingName.Cctv2] = AppConstants.CctvHttp;
             localSettings.Values[LocalSettingName.Username] = AppConstants.Username;
@@ -64,6 +66,7 @@ namespace CamObserver.UWP
 
                 localSettings.Values[LocalSettingName.Gateway] = "Gateway-001";
                 localSettings.Values[LocalSettingName.Lokasi] = "Botani Square Bogor";
+                localSettings.Values[LocalSettingName.CCTV] = "CCTV-001";
                 localSettings.Values[LocalSettingName.Cctv1] = "rtsp://admin:123qweasd!@192.168.68.113:554/Streaming/Channels/101";
                 localSettings.Values[LocalSettingName.Cctv2] = "http://192.168.68.6/ISAPI/Streaming/channels/101/picture";
                 localSettings.Values[LocalSettingName.Username] = "admin";
@@ -82,6 +85,7 @@ namespace CamObserver.UWP
         public static readonly string AutoStart = "AutoStart";
         public static readonly string GrpcUrl = "GrpcUrl";
         public static readonly string SelectionArea = "SelectionArea";
+        public static readonly string CCTV = "CCTV";
         public static readonly string Cctv1 = "Cctv1";
         public static readonly string Cctv2 = "Cctv2";
         public static readonly string Cctv3 = "Cctv3";
