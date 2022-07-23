@@ -4,9 +4,9 @@
 @inject NavigationManager NavMgr
 @inject IToastService toastService
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
-
-
+@inject IDialogService DialogService
 @using System.IO
+
 <h1>Daftar DataCounter</h1>
 
 <p>Gunakan halaman ini untuk melihat info DataCounter.</p>
@@ -17,59 +17,61 @@
 }
 else
 {
-    <body onbeforeunload="TestDataTablesRemove('#gridData')">
-        <div class="table-responsive">
-            <table id="gridData" name="gridData" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Objek</th>
-                        <th>Lokasi</th>
-                        <th>Deskripsi</th>
-                        <th>Tags</th>
-                        <th>CCTV</th>
-                        <th>File Url</th>
-                        <th>Actions</th>
-                    </tr>
+    <MudTable Context="item" Items="@DataDataCounter" Dense="@dense" Hover="@hover" Bordered="@bordered" Striped="@striped" Filter="new Func<DataCounter,bool>(FilterFunc1)" @bind-SelectedItem="selectedItem1">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Data DataCounter</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>Tanggal</MudTh>
+            <MudTh>Objek</MudTh>
+            <MudTh>Lokasi</MudTh>
+            <MudTh>Deskripsi</MudTh>
+            <MudTh>Tags</MudTh>
+            <MudTh>CCTV</MudTh>
+            <MudTh>File Url</MudTh>
+            <MudTh>Actions</MudTh>
 
-                </thead>
-                <tbody>
-                    @foreach (var item in DataDataCounter)
-                    {
-                        <tr>
-                           
-                            <td>@item.Tanggal.ToString("dd/MMM/yyyy HH:mm")</td>
-                            <td>@item.Objek</td>
-                            <td>@item.Lokasi</td>
-                            <td>@item.Deskripsi</td>
-                            <td>@item.Tags</td>
-                            <td>@item.CCTV</td>
-                            <td>@item.FileUrl</td>
-                            <td>
-                                @if (HasLogin)
-                                {
-                                    <input type="button" class="btn btn-primary btn-sm mt-1" @onclick="(() => PrepareForEdit(item))" data-toggle="modal" data-target="#taskModal" value="Ubah" />
-                                    <input type="button" class="btn btn-danger btn-sm mt-1" @onclick="(() => PrepareForDelete(item))" data-toggle="modal" data-target="#confirmDeleteModal" value="Hapus" />
-                                }
-                            </td>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Tanggal">@item.Tanggal.ToString("dd/MMM/yyyy HH:mm")</MudTd>
+            <MudTd DataLabel="Objek">@item.Objek</MudTd>
+            <MudTd DataLabel="Lokasi">@item.Lokasi</MudTd>
+            <MudTd DataLabel="Deskripsi">@item.Deskripsi</MudTd>
+            <MudTd DataLabel="Tags">@item.Tags</MudTd>
+            <MudTd DataLabel="CCTV">@item.CCTV</MudTd>
 
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </body>
+            <MudTd DataLabel="FileUrl">@item.FileUrl</MudTd>
+
+            <MudTd DataLabel="Actions">
+                @if (HasLogin)
+                {
+                <MudButton ButtonType="ButtonType.Button" @onclick="(() => PrepareForEdit(item))" DisableElevation="true" Variant="Variant.Filled" Color="Color.Primary" Class="mr-2">Ubah</MudButton>
+                <MudButton ButtonType="ButtonType.Button" @onclick="(() => PrepareForDelete(item))" DisableElevation="true" Variant="Variant.Filled" Color="Color.Error" Class="mr-2">Hapus</MudButton>
+                }
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+    <div class="d-flex flex-wrap mt-4">
+        <MudSwitch @bind-Checked="@hover" Color="Color.Primary">Hover</MudSwitch>
+        <MudSwitch @bind-Checked="@dense" Color="Color.Secondary">Dense</MudSwitch>
+        <MudSwitch @bind-Checked="@striped" Color="Color.Tertiary">Striped</MudSwitch>
+        <MudSwitch @bind-Checked="@bordered" Color="Color.Warning">Bordered</MudSwitch>
+    </div>
+
+
 }
 @if (HasLogin)
 {
-    <div>
-        <input type="button" data-toggle="modal" data-target="#taskModal" class="btn btn-primary" value="Masukan DataCounter Baru" @onclick="(() => InitializeitemObject())" />
-    </div>
+    <MudPaper Class="pa-4 mt-4">
+        <MudButton ButtonType="ButtonType.Button" @onclick="(() => InitializeitemObject())" DisableElevation="true" Variant="Variant.Filled" Color="Color.Primary" Class="mr-2">Masukan DataCounter Baru</MudButton>
+    </MudPaper>
 }
-<ConfirmDialog OnClick="@Delete" />
-<DataCounterDetail @ref="detail" TaskObject=@itemObject DataChanged="@DataChanged">
-    <CustomHeader>@customHeader</CustomHeader>
-</DataCounterDetail>
 
 @code {
     bool HasLogin = false;
@@ -82,6 +84,35 @@ else
     private Task<AuthenticationState> authenticationStateTask { get; set; }
     string UserName;
 
+    private bool dense = false;
+    private bool hover = true;
+    private bool striped = false;
+    private bool bordered = false;
+    private string searchString1 = "";
+    private DataCounter selectedItem1 = null;
+
+    private HashSet<DataCounter> selectedItems = new HashSet<DataCounter>();
+
+    private bool FilterFunc1(DataCounter element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(DataCounter element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Objek.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.CCTV.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Deskripsi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Tags.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Lokasi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
     async Task DownloadFile(string Url)
     {
         if (!string.IsNullOrEmpty(Url))
@@ -92,23 +123,21 @@ else
         {
             toastService.ShowError("Url kosong atau tidak valid.");
         }
-
     }
-
 
     CamObserver.Web.Data.UserProfileService Userservice;
     protected override async Task OnInitializedAsync()
     {
 
-        if (Userservice == null) Userservice = new  UserProfileService();
+        if (Userservice == null) Userservice = new UserProfileService();
         var user = (await authenticationStateTask).User;
 
         if (user.Identity.IsAuthenticated)
         {
             UserName = user.Identity.Name;
-            HasLogin = Userservice.GetUserRole(UserName)==Roles.Admin;
+            HasLogin = true;// Userservice.GetUserRole(UserName) == Roles.Admin;
         }
-    
+
         if (service == null) service = new DataCounterService();
 
         DataDataCounter = service.GetAllData();
@@ -117,28 +146,29 @@ else
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (DataDataCounter != null && DataDataCounter.Count > 0)
-        {
-
-            await jsRuntime.InvokeAsync<object>("TestDataTablesAdd", "#gridData");
-        }
         if (firstRender)
         {
-            
         }
     }
 
-    private void InitializeitemObject()
+    private async Task InitializeitemObject()
     {
 
         itemObject = new DataCounter();
-      
-
-        //detail.DocumentUrl = "";
-
-        //itemObject.Id = -1;
 
         customHeader = "Masukan DataCounter Baru";
+
+        var action = new Action(DataChanged);
+        var parameters = new DialogParameters { ["TaskObject"] = itemObject, ["CustomHeader"] = customHeader, ["DataChanged"] = action };
+
+        var dialog = DialogService.Show<DataCounterDetail>(customHeader, parameters);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            //In a real world scenario we would reload the data from the source here since we "removed" it in the dialog already.
+            long.TryParse(result.Data.ToString(), out var NewId);
+        }
     }
     private async void DataChanged()
     {
@@ -146,27 +176,38 @@ else
         StateHasChanged();
     }
 
-    private void PrepareForEdit(DataCounter item)
+    private async Task PrepareForEdit(DataCounter item)
     {
         customHeader = "Ubah Data DataCounter";
         itemObject = item;
-        //detail.DocumentUrl = item.DocumentUrl;
+        var action = new Action(DataChanged);
+        var parameters = new DialogParameters { ["TaskObject"] = itemObject, ["CustomHeader"] = customHeader, ["DataChanged"] = action };
+
+        var dialog = DialogService.Show<DataCounterDetail>(customHeader, parameters);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            //In a real world scenario we would reload the data from the source here since we "removed" it in the dialog already.
+            long.TryParse(result.Data.ToString(), out var NewId);
+        }
+
     }
-    private void PrepareForDelete(DataCounter item)
+    private async Task PrepareForDelete(DataCounter item)
     {
         itemObject = item;
-    }
-    private async Task Delete()
-    {
-        var task = service.DeleteData(itemObject.Id);
-        await jsRuntime.InvokeAsync<object>("CloseModal", "confirmDeleteModal");
-        DataDataCounter = service.GetAllData();
-        itemObject = new DataCounter() { Id = -1 };
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<ConfirmDialog>("Konfirmasi", options);
+        var result = await dialog.Result;
+
+        if (!result.Cancelled)
+        {
+            var task = service.DeleteData(itemObject.Id);
+            //await jsRuntime.InvokeAsync<object>("CloseModal", "confirmDeleteModal");
+            DataDataCounter = service.GetAllData();
+            itemObject = new DataCounter() { Id = -1 };
+        }
     }
 
-    private async System.Threading.Tasks.Task applyPager(string TableName)
-    {
-        await jsRuntime.InvokeAsync<object>("applyPager", TableName);
-    }
 
 }

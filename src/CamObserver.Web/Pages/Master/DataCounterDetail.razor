@@ -3,94 +3,91 @@
 @inject IToastService toastService
 @inject DataCounterService service
 @inject AzureBlobHelper blob;
-<div class="modal" tabindex="-1" role="dialog" id="taskModal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">@CustomHeader</h5>
 
+@inject ISnackbar Snackbar
 
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <EditForm Model="@TaskObject" OnValidSubmit="@HandleValidSubmit">
-                    <DataAnnotationsValidator />
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Info" Class="mr-3 mb-n1" />
+            @CustomHeader
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm Model="@TaskObject" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem xs="12" sm="12">
+                    <MudCard>
+                        <MudCardContent>
+                            <input type="hidden" @bind="@TaskObject.Id" />
+                            <MudTextField Label="Objek" HelperText="Objek"
+                                          @bind-Value="TaskObject.Objek" For="@(() => TaskObject.Objek)" />
 
-                    <div class="form-group">
-                        <label for="objek">Objek</label>
-                        <input type="hidden" @bind="@TaskObject.Id" />
-                        <input type="text" id="objek" class="form-control" @bind="@TaskObject.Objek" />
-                        <ValidationMessage For="@(() => TaskObject.Objek)" />
-                    </div>
+                            <MudTextField Label="Tanggal" Class="mt-3"
+                                          @bind-Value="TaskObject.Tanggal" For="@(() => TaskObject.Tanggal)" InputType="InputType.Date" />
 
-                    <div class="form-group">
-                        <label for="pic">Tanggal</label>
-                        <input type="datetime" id="pic" class="form-control" @bind="@TaskObject.Tanggal" />
-                        <ValidationMessage For="@(() => TaskObject.Tanggal)" />
-                    </div>
+                            <MudTextField Label="Lokasi" Class="mt-3"
+                                          @bind-Value="TaskObject.Lokasi" For="@(() => TaskObject.Lokasi)" InputType="InputType.Text" />
 
-                     <div class="form-group">
-                        <label for="lokasi">Lokasi</label>
-                        <textarea id="lokasi" class="form-control" @bind="@TaskObject.Lokasi" />
-                        <ValidationMessage For="@(() => TaskObject.Lokasi)" />
-                    </div>
+                            <MudTextField Label="Deskripsi" Class="mt-3"
+                                          @bind-Value="TaskObject.Deskripsi" For="@(() => TaskObject.Deskripsi)" InputType="InputType.Text" />
 
-                    <div class="form-group">
-                        <label for="Deskripsi">Deskripsi </label>
-                        <textarea type="text" id="Deskripsi" class="form-control" @bind="@TaskObject.Deskripsi" />
-                        <ValidationMessage For="@(() => TaskObject.Deskripsi)" />
-                    </div> 
-                    
-                    <div class="form-group">
-                        <label for="CCTV">CCTV </label>
-                        <textarea type="text" id="CCTV" class="form-control" @bind="@TaskObject.CCTV" />
-                        <ValidationMessage For="@(() => TaskObject.CCTV)" />
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="Tags">Tags </label>
-                        <textarea type="text" id="Tags" class="form-control" @bind="@TaskObject.Tags" />
-                        <ValidationMessage For="@(() => TaskObject.Tags)" />
-                    </div>
+                            <MudTextField Label="CCTV" Class="mt-3"
+                                          @bind-Value="TaskObject.CCTV" For="@(() => TaskObject.CCTV)" InputType="InputType.Text" />
 
-                   
+                            <MudTextField Label="Tags" Class="mt-3"
+                                          @bind-Value="TaskObject.Tags" For="@(() => TaskObject.Tags)" InputType="InputType.Text" />
 
-                    <button type="submit" class="btn btn-primary">Simpan</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </EditForm>
+                            <MudTextField Label="FileUrl" Class="mt-3"
+                                          @bind-Value="TaskObject.FileUrl" For="@(() => TaskObject.FileUrl)" InputType="InputType.Text" />
 
-            </div>
-        </div>
-    </div>
-</div>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mr-2">Simpan</MudButton>
+                            <MudButton ButtonType="ButtonType.Button" OnClick="Cancel" Variant="Variant.Filled" Color="Color.Secondary">Cancel</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+
+    </DialogActions>
+</MudDialog>
+
 
 @code {
 
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
     [Parameter]
-    public RenderFragment CustomHeader { get; set; }
+    public string CustomHeader { get; set; }
     [Parameter]
     public DataCounter TaskObject { get; set; }
     [Parameter]
     public Action DataChanged { get; set; }
-    
+
     protected override async Task OnInitializedAsync()
     {
     }
-
-
-    private async void HandleValidSubmit()
+    private void OnValidSubmit(EditContext context)
     {
-
-       
         if (TaskObject.Id == 0)
         {
 
             var hasil = service.InsertData(TaskObject);
             if (!hasil)
             {
-                toastService.ShowError("Gagal menyimpan data. Isi data dengan lengkap.", "Perhatian");
+                Snackbar.Add("Gagal menyimpan data. Isi data dengan lengkap.", Severity.Error);
+                //toastService.ShowError("Gagal menyimpan data. Isi data dengan lengkap.", "Perhatian");
             }
         }
         else
@@ -98,14 +95,10 @@
             service.UpdateData(TaskObject);
         }
 
-        await CloseTaskModal();
+        //In a real world scenario this bool would probably be a service to delete the item from api/database
+        Snackbar.Add("Data Saved", Severity.Success);
+        MudDialog.Close(DialogResult.Ok(TaskObject.Id));
         DataChanged?.Invoke();
     }
-   
-    private async Task CloseTaskModal()
-    {
-        await jsRuntime.InvokeAsync<object>("CloseModal", "taskModal");
-    }
-
 
 }

@@ -9,45 +9,44 @@
 @inject IToastService toastService
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
-@using CamObserver.Web.Pages.Common
+@inject ISnackbar Snackbar
 
-<div class="fw-table w-75">
-    <div class="row fw-tableHeader mx-1">
-        <h5 class="pt-1 mb-0">Profil Saya</h5>
-        <div class="fw-table-header-actions">
-        </div>
-    </div>
-    <div class="row mb-4 mx-0">
-        <div class="col-lg-12 mt-4">
-            <div class="form-group">
-                <label for="fullname"><b>Nama Lengkap</b></label>
-                <input @bind="DataUser.FullName" type="text" class="form-control" id="txtNama" placeholder="Nama">
-            </div>
-            <div class="form-group">
-                <label for="phone"><b>Telepon</b></label>
-                <input @bind="DataUser.Phone" type="text" class="form-control" id="txtNoHp" placeholder="No Hp">
-            </div>
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Align="Align.Center" Typo="Typo.h6">Profil Saya</MudText>
+    </MudItem>
+    <MudItem xs="12" sm="12">
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Nama Lengkap" HelperText="Nama Anda"
+                              @bind-Value="DataUser.FullName" For="@(() => DataUser.FullName)" />
 
-            <div class="form-group">
-                <label for="alamat"><b>Alamat</b></label>
-                <textarea @bind="DataUser.Alamat" class="form-control" id="txtAlamat" placeholder="Alamat"></textarea>
-            </div>
+                <MudTextField Label="Telepon" HelperText="No Hp Anda" Class="mt-3"
+                              @bind-Value="DataUser.Phone" For="@(() => DataUser.Phone)" InputType="InputType.Telephone" />
 
-           
+                <MudTextField Label="Alamat" HelperText="Alamat Anda" Class="mt-3"
+                              @bind-Value="DataUser.Alamat" For="@(() => DataUser.Alamat)" InputType="InputType.Text" />
 
-            <div class="form-group">
-                <label for="psw"><b>Password</b></label>
-                <input type="password" @bind="DataUser.Password" class="form-control" id="txtPassword" placeholder="Ketik untuk ganti password">
-            </div>
-            <div class="form-group">
-                <label for="psw-repeat"><b>Ulang Password</b></label>
-                <input type="password" @bind="RetypePass" class="form-control" id="txtPassword" placeholder="Ketik ulang password">
-            </div>
-            <button @onclick="Simpan" class="btn btn-primary btn-block btn-lg">Simpan Perubahan</button>
-            <button @onclick="Kembali" class="btn btn-primary btn-block btn-lg">Kembali</button>
-        </div>
-    </div>
-</div>
+
+
+                <MudTextField Label="Password" HelperText="Password Anda" Class="mt-3"
+                              @bind-Value="DataUser.Password" For="@(() => DataUser.Password)" InputType="InputType.Password" />
+
+                <MudTextField Label="Ulang Password" HelperText="Ulang Password Anda" Class="mt-3"
+                              @bind-Value="RetypePass" For="@(() => RetypePass)" InputType="InputType.Password" />
+
+
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Button" @onclick="Simpan" DisableElevation="true" Variant="Variant.Filled" Color="Color.Primary" Class="mr-2">Simpan</MudButton>
+                <MudButton ButtonType="ButtonType.Button" @onclick="Kembali" DisableElevation="true" Variant="Variant.Filled" Color="Color.Secondary" Class="mr-2">Kembali</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+</MudGrid>
+
+
 
 @code {
     UserProfile DataUser = new UserProfile();
@@ -108,7 +107,8 @@
 
         if (ErrorMsg.Length > 0)
         {
-            toastService.ShowWarning(ErrorMsg, "Perhatian");
+            Snackbar.Add(ErrorMsg, Severity.Error);
+            //toastService.ShowWarning(ErrorMsg, "Perhatian");
             return;
         }
 
@@ -116,7 +116,8 @@
         DataUser.Password = enc.Encrypt(DataUser.Password);
         if (service.UpdateData(DataUser))
         {
-            toastService.ShowSuccess("Profile Anda sudah berhasil di update. Terima kasih", "Info");
+            Snackbar.Add("Profile Anda sudah berhasil di update. Terima kasih", Severity.Success);
+            //toastService.ShowSuccess("Profile Anda sudah berhasil di update. Terima kasih", "Info");
         }
     }
 

@@ -1,0 +1,49 @@
+﻿<Page
+    x:Class="CamObserver.UWP.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CamObserver.UWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    xmlns:vlc="using:VLC"
+    xmlns:local_controls="using:CamObserver.UWP.Controls"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <SplitView x:Name="mainSplitView" DisplayMode="CompactInline" IsPaneOpen="False"
+                   CompactPaneLength="70" OpenPaneLength="180" Margin="0 10 0 0">
+            <SplitView.Pane>
+                <StackPanel Background="Gray">
+                    <Button x:Name="btnShowPane" Background="Transparent" Click="btnShowPane_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon x:Name="btnShowPaneIcon" Width="50" Height="50" FontFamily="Segoe Fluent Icons"
+                                Glyph="&#xe76c;"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="btnCctv" Background="Transparent" Click="btnCctv_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon Width="50" Height="50" FontFamily="Segoe Fluent Icons"
+                                Glyph="&#xe74c;"/>
+                            <TextBlock Text="Cctv" FontSize="16" Width="100" VerticalAlignment="Center" Margin="15 0 0 0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="btnSetting" Background="Transparent" Click="btnSetting_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <FontIcon Width="50" Height="50" FontFamily="Segoe Fluent Icons"
+                                Glyph="&#xe713;"/>
+                            <TextBlock Text="Settings" FontSize="16" Width="100" VerticalAlignment="Center" Margin="15 0 0 0"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </SplitView.Pane>
+            <Frame x:Name="frameMainContent">
+                <Frame.ContentTransitions>
+                    <TransitionCollection>
+                        <NavigationThemeTransition/>
+                    </TransitionCollection>
+                </Frame.ContentTransitions>
+            </Frame>
+        </SplitView>
+    </Grid>
+</Page>

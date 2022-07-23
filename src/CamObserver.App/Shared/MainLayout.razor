@@ -1,0 +1,81 @@
+﻿@inherits LayoutComponentBase
+@using Blazored.Toast.Configuration
+
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject NavigationManager NavMgr
+@inject IJSRuntime jsRuntime
+@inject UserProfileService Userservice
+<PageTitle>CamObserver.App</PageTitle>
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Elevation="0">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+
+        <MudIconButton Icon="@Icons.Material.Filled.Person" Color="Color.Inherit" Link="/master/user-profile" />
+        <MudIconButton Icon="@Icons.Material.Filled.Close" Color="Color.Inherit" @onclick="Keluar" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">CamObserver.App</MudText>
+        </MudDrawerHeader>
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Large" Class="my-16 pt-16">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    
+    async Task Keluar()
+    {
+        await localStorage.SetItemAsync(AppConstants.NameKey, "");
+        NavMgr.NavigateTo($"/auth/login");
+    }
+    string UserName;
+    protected override async Task OnInitializedAsync()
+    {
+
+        if (string.IsNullOrEmpty(UserName))
+        {
+            try
+            {
+                UserName = await localStorage.GetItemAsync<string>(AppConstants.NameKey);
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            if (string.IsNullOrEmpty(UserName))
+            {
+                NavMgr.NavigateTo($"/auth/login");
+            }
+            else
+            {
+
+            }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+        }
+    }
+}

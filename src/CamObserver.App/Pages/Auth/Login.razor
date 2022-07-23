@@ -1,0 +1,98 @@
+﻿@page "/auth/login"
+@using Microsoft.AspNetCore.Components.Authorization
+@layout NoAuthLayout
+@inject ILoginService LoginService
+@inject AuthenticationStateProvider authStateProvider
+@inject AuthService service
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IToastService toastService
+@inject NavigationManager NavMgr
+@inject ISnackbar Snackbar
+
+<MudGrid>
+    <MudItem xs="12">
+        <MudText Align="Align.Center" Typo="Typo.h6">Login</MudText>
+    </MudItem>
+    <MudItem xs="12" sm="12">
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Email" HelperText="email Anda"
+                              @bind-Value="Username" For="@(() => Username)" />
+
+                <MudTextField Label="Password" HelperText="Password Anda" Class="mt-3"
+                              @bind-Value="Password" For="@(() => Password)" @onkeyup="KeyUp" InputType="InputType.Password" />
+                <div class="d-flex align-center justify-space-between">
+                    <MudCheckBox T="bool" Required="false" Label="Ingat Saya" />
+                </div>
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Button" @onclick="Masuk" DisableElevation="true" Variant="Variant.Filled" Color="Color.Primary" Class="mr-2">Login</MudButton>
+                <MudButton ButtonType="ButtonType.Button" @onclick="DaftarNow" DisableElevation="true" Variant="Variant.Filled" Color="Color.Secondary" Class="mr-2">Daftar Baru</MudButton>
+                <MudButton ButtonType="ButtonType.Button" Href="/auth/forgot-password" DisableElevation="true" Variant="Variant.Filled" Color="Color.Info">Lupa Password</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" sm="12">
+        <MudPaper Class="pa-4 mud-height-full">
+
+            @if (showError)
+            {
+
+                <MudText Color="@Color.Error">
+                    username/password salah atau tidak terdaftar
+                </MudText>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    bool showError = false;
+    string Username = "";
+    string Password = "";
+    public bool Gagal { set; get; }
+
+    async Task KeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Masuk();
+        }
+    }
+
+    async Task DaftarNow()
+    {
+        NavMgr.NavigateTo("/auth/register");
+    }
+
+    async void Masuk()
+    {
+        var userInfo = await LoginService.Authenticate(Username, Password);
+
+        if (userInfo == null)
+        {
+            Snackbar.Add("Password salah", Severity.Error);
+            showError = true;
+        }
+        //toastService.ShowError("Password salah");
+        else
+        {
+            var state = await authStateProvider.GetAuthenticationStateAsync();
+
+            Lanjut();
+        }
+    }
+
+    async Task Lanjut()
+    {
+        await localStorage.SetItemAsync(AppConstants.NameKey, Username);
+        NavMgr.NavigateTo($"/");
+        Gagal = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+}
