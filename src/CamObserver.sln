@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32505.426
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{3217F8BA-C125-4652-B854-D78C61C2433D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{9BAAFF89-5F0B-4D79-8268-82107918D71F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cam", "Cam", "{CD6B3C63-8C84-46DF-BDCE-6BE10990F98F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{216FB877-D1A6-401B-9F82-1514D0F9CEEC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamObserver.Tools", "CamObserver.Tools\CamObserver.Tools.csproj", "{5097C3AE-6679-4973-A97A-05EE2DE289AB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamObserver.Models", "CamObserver.Models\CamObserver.Models.csproj", "{5C6A71C7-28A1-40A3-BCB7-50234202789B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamObserver.Services", "CamObserver.Services\CamObserver.Services.csproj", "{6CD549F8-A4E7-4B39-862B-193D9EB631F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CamObserver.Web", "CamObserver.Web\CamObserver.Web.csproj", "{CBC85C83-C457-4B15-BE87-4E92DE0A5E9B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5097C3AE-6679-4973-A97A-05EE2DE289AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5097C3AE-6679-4973-A97A-05EE2DE289AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5097C3AE-6679-4973-A97A-05EE2DE289AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5097C3AE-6679-4973-A97A-05EE2DE289AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C6A71C7-28A1-40A3-BCB7-50234202789B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C6A71C7-28A1-40A3-BCB7-50234202789B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C6A71C7-28A1-40A3-BCB7-50234202789B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C6A71C7-28A1-40A3-BCB7-50234202789B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CD549F8-A4E7-4B39-862B-193D9EB631F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CD549F8-A4E7-4B39-862B-193D9EB631F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CD549F8-A4E7-4B39-862B-193D9EB631F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CD549F8-A4E7-4B39-862B-193D9EB631F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBC85C83-C457-4B15-BE87-4E92DE0A5E9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBC85C83-C457-4B15-BE87-4E92DE0A5E9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBC85C83-C457-4B15-BE87-4E92DE0A5E9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBC85C83-C457-4B15-BE87-4E92DE0A5E9B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5097C3AE-6679-4973-A97A-05EE2DE289AB} = {3217F8BA-C125-4652-B854-D78C61C2433D}
+		{5C6A71C7-28A1-40A3-BCB7-50234202789B} = {3217F8BA-C125-4652-B854-D78C61C2433D}
+		{6CD549F8-A4E7-4B39-862B-193D9EB631F7} = {216FB877-D1A6-401B-9F82-1514D0F9CEEC}
+		{CBC85C83-C457-4B15-BE87-4E92DE0A5E9B} = {9BAAFF89-5F0B-4D79-8268-82107918D71F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {65A1D1E6-9ACF-40D2-A1E1-17D567B2F2DA}
+	EndGlobalSection
+EndGlobal
