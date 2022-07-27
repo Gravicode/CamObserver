@@ -1,8 +1,13 @@
 using BMC.Drivers.BasicGraphics;
 using Iot.Device.Ws28xx.Esp32;
+using nanoFramework.M2Mqtt;
+using nanoFramework.M2Mqtt.Messages;
 using System;
+using System.Collections;
 using System.Device.Wifi;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Threading;
 
 namespace LedApp
@@ -11,12 +16,17 @@ namespace LedApp
     {  // Set the SSID & Password to your local Wifi network
         const string MYSSID = "bmc makerspace";
         const string MYPASSWORD = "123qweasd";
-
+        const string MqttHost = "test.mosquitto.org";
+        const string MqttClientId = "led-app";
+        const string Topic = "/led/data";
+        
         const int MATRIX_WIDTH = rows;
         const int MATRIX_HEIGHT = cols * 4;
         const int cols = 32;
         const int rows = 8;
         static LedMatrix matrix;
+        static bool IsConnected = false;
+        static MqttClient mqtt;
         public static void Main()
         {
             try
@@ -41,7 +51,29 @@ namespace LedApp
                 Debug.WriteLine("message:" + ex.Message);
                 Debug.WriteLine("stack:" + ex.StackTrace);
             }
+            if(IsConnected)
+            {
+                mqtt = new MqttClient(MqttHost);//, 8883, true, new X509Certificate(CertMosquitto), null, MqttSslProtocols.TLSv1_2);
 
+                // register to message received
+                mqtt.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
+
+                var ret = mqtt.Connect(MqttClientId, true);
+                
+                // subscribe to the topic "/home/temperature" with QoS 2
+                mqtt.Subscribe(new string[] { Topic }, new MqttQoSLevel[] {  MqttQoSLevel.ExactlyOnce });
+
+                // You can add some code here
+
+               
+                if (ret != MqttReasonCode.Success)
+                {
+                    Debug.WriteLine($"ERROR connecting: {ret}");
+                    mqtt.Disconnect();
+                    return;
+                }
+
+            }
             var PinLed = 1;
             Debug.WriteLine("Matrix Testing !!");
             matrix = new LedMatrix(PinLed, MATRIX_HEIGHT, MATRIX_WIDTH);
@@ -57,7 +89,18 @@ namespace LedApp
             // Check our documentation online: https://docs.nanoframework.net/
             // Join our lively Discord community: https://discord.gg/gCyBu8T
         }
-
+        static void client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
+        {
+            if (e.Topic == Topic)
+            {
+                nanoFramework.Json.JsonSerializer serial = new nanoFramework.Json.JsonSerializer();
+                string json = Encoding.UTF8.GetString(e.Message, 0, e.Message.Length);
+                var item = (DeviceData)nanoFramework.Json.JsonConvert.DeserializeObject(json,typeof(DeviceData));
+                if(item!=null)
+                    SetLevel(item.Progress);
+            }
+            // handle message received 
+        }
         /// <summary>
         /// Event handler for when Wifi scan completes
         /// </summary>
@@ -89,9 +132,11 @@ namespace LedApp
                     if (result.ConnectionStatus == WifiConnectionStatus.Success)
                     {
                         Debug.WriteLine("Connected to Wifi network");
+                        IsConnected = true;
                     }
                     else
                     {
+                        IsConnected = false;
                         Debug.WriteLine($"Error {result.ConnectionStatus.ToString()} connecting o Wifi network");
                     }
                 }
@@ -127,8 +172,12 @@ namespace LedApp
             matrix.Flush();
         }
     }
-
-    class LedMatrix : BasicGraphics
+    public class DeviceData
+    {
+        public DateTime Tanggal { get; set; }
+        public float Progress { get; set; }
+    }
+    public class LedMatrix : BasicGraphics
     {
         private int row, column;
         Ws28xx leds;
