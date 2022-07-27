@@ -74,7 +74,7 @@ namespace LedApp
                 }
 
             }
-            var PinLed = 1;
+            var PinLed = nanoFramework.Hardware.Esp32.Gpio.IO13;
             Debug.WriteLine("Matrix Testing !!");
             matrix = new LedMatrix(PinLed, MATRIX_HEIGHT, MATRIX_WIDTH);
             var pct = 0;
