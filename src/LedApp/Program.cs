@@ -176,6 +176,9 @@ namespace LedApp
     {
         public DateTime Tanggal { get; set; }
         public float Progress { get; set; }
+
+        public float Target { get; set; }
+        public float Current { get; set; }
     }
     public class LedMatrix : BasicGraphics
     {
