@@ -67,7 +67,7 @@ namespace CamObserver.UWP
                 localSettings.Values[LocalSettingName.Gateway] = "Gateway-001";
                 localSettings.Values[LocalSettingName.Lokasi] = "Botani Square Bogor";
                 localSettings.Values[LocalSettingName.CCTV] = "CCTV-001";
-                localSettings.Values[LocalSettingName.Cctv1] = "rtsp://admin:123qweasd!@192.168.68.113:554/Streaming/Channels/101";
+                localSettings.Values[LocalSettingName.Cctv1] = "http://192.168.43.203:8080/image.jpg";// "rtsp://admin:123qweasd!@192.168.68.113:554/Streaming/Channels/101";
                 localSettings.Values[LocalSettingName.Cctv2] = "http://192.168.68.6/ISAPI/Streaming/channels/101/picture";
                 localSettings.Values[LocalSettingName.Username] = "admin";
                 localSettings.Values[LocalSettingName.Password] = "123qweasd!";
