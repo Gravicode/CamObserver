@@ -18,20 +18,21 @@
                     <Button x:Name="btnShowPane" Background="Transparent" Click="btnShowPane_Click">
                         <StackPanel Orientation="Horizontal">
                             <FontIcon x:Name="btnShowPaneIcon" Width="50" Height="50" FontFamily="Segoe Fluent Icons"
-                                Glyph="&#xe76c;"/>
+                               Glyph="" />
+                            <TextBlock Text="Show" FontSize="16" Width="100" VerticalAlignment="Center" Margin="15 0 0 0"/>
                         </StackPanel>
                     </Button>
                     <Button x:Name="btnCctv" Background="Transparent" Click="btnCctv_Click">
                         <StackPanel Orientation="Horizontal">
                             <FontIcon Width="50" Height="50" FontFamily="Segoe Fluent Icons"
-                                Glyph="&#xe74c;"/>
+                                Glyph=""/>
                             <TextBlock Text="Cctv" FontSize="16" Width="100" VerticalAlignment="Center" Margin="15 0 0 0"/>
                         </StackPanel>
                     </Button>
                     <Button x:Name="btnSetting" Background="Transparent" Click="btnSetting_Click">
                         <StackPanel Orientation="Horizontal">
                             <FontIcon Width="50" Height="50" FontFamily="Segoe Fluent Icons"
-                                Glyph="&#xe713;"/>
+                                Glyph=""/>
                             <TextBlock Text="Settings" FontSize="16" Width="100" VerticalAlignment="Center" Margin="15 0 0 0"/>
                         </StackPanel>
                     </Button>
