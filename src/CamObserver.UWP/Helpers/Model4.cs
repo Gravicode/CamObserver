@@ -84,7 +84,7 @@ namespace CamObserver.UWP.Helpers
             return session;
         }
 
-        public async Task<List<Result>> EvaluateFrame(VideoFrame frame, Rectangle selectRect)
+        public async Task<List<Result>> EvaluateFrame(VideoFrame frame, List<PointF> selectRect)
         {
 
             try

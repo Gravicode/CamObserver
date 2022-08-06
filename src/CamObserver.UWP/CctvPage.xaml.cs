@@ -38,7 +38,7 @@ namespace CamObserver.UWP
     public sealed partial class CctvPage : Page, IDisposable
     {
         public enum StreamSourceTypes { WebCam, RTSP, HttpImage }
-        StreamSourceTypes Mode = StreamSourceTypes.RTSP;
+        StreamSourceTypes Mode = StreamSourceTypes.WebCam;
 
         PointF StartLocation;
         bool IsSelect = false;
@@ -52,10 +52,8 @@ namespace CamObserver.UWP
         private readonly double _line_thickness = 2.0;
         ImageHttpHelper Grabber;
         int DelayTime = 30;
-        System.Drawing.Rectangle SelectionArea = new System.Drawing.Rectangle(0, 0, 0, 0);
+        List<System.Drawing.PointF> SelectionArea = new List<PointF>();
         VideoFrame frame;
-        Rectangle selection;
-        System.Drawing.Rectangle selectRect;
         bool IsTracking = false;
         //RtspHelper rtsp;
         private bool processing;
@@ -63,7 +61,9 @@ namespace CamObserver.UWP
         private int count;
         double ImgWidth, ImgHeight;
         DataCounterService dataCounterService;
-
+        List<System.Drawing.PointF> selectPoly = new List<PointF>();
+        List<System.Drawing.PointF> SelectionAreaPoly= new List<PointF> ();
+        List<System.Drawing.PointF> TempSelectionAreaPoly= new List<PointF>();
         public CctvPage()
         {
             this.InitializeComponent();
@@ -92,7 +92,7 @@ namespace CamObserver.UWP
             AppConfig.Load();
             if (!string.IsNullOrEmpty(AppConstants.SelectionArea))
             {
-                SelectionArea = JsonSerializer.Deserialize<System.Drawing.Rectangle>(AppConstants.SelectionArea);
+                SelectionArea = JsonSerializer.Deserialize<List< System.Drawing.PointF>>(AppConstants.SelectionArea);
                 RefreshSelection();
             }
 
@@ -102,46 +102,54 @@ namespace CamObserver.UWP
             button_go.IsEnabled = false;
             this.Loaded += OnPageLoaded;
             this.Unloaded += (a, b) => { AppConfig.Save(); };
-
-            OverlayCanvas.PointerPressed += (s, e) =>
-            {
-                PointerPoint ptrPt = e.GetCurrentPoint(this.OverlayCanvas);
-
-                if (ptrPt.Properties.IsLeftButtonPressed)
-                {
-                    IsSelect = true;
-                    var pos = e.GetCurrentPoint(this.OverlayCanvas).Position;
-                    StartLocation = new PointF((float)pos.X, (float)pos.Y);
-                }
-            };
-            OverlayCanvas.PointerMoved += (s, e) =>
-            {
-                if (IsSelect)
-                {
-                    var pos = e.GetCurrentPoint(this.OverlayCanvas).Position;
-                    SelectionArea.X = (int)Math.Min(StartLocation.X, pos.X);
-                    SelectionArea.Y = (int)Math.Min(StartLocation.Y, pos.Y);
-                    SelectionArea.Width = (int)Math.Abs(StartLocation.X - pos.X);
-                    SelectionArea.Height = (int)Math.Abs(StartLocation.Y - pos.Y);
-                    RefreshSelection();
-                }
+            BtnClearArea.Click += (a, b) => {
+                TempSelectionAreaPoly.Clear();
+                SelectionAreaPoly.Clear();
+                selectPoly.Clear();
+                RefreshSelection();
             };
             OverlayCanvas.PointerReleased += (s, e) =>
             {
+                
                 PointerPoint ptrPt = e.GetCurrentPoint(this.OverlayCanvas);
-                if (IsSelect)
+               
+                if (ChkSelectArea.IsChecked.HasValue && ChkSelectArea.IsChecked.Value)
                 {
-                    IsSelect = false;
-                    RefreshSelection();
+                    if (ptrPt.Properties.PointerUpdateKind==PointerUpdateKind.LeftButtonReleased)
+                    {
+                        var pos = e.GetCurrentPoint(this.OverlayCanvas).Position;
+                        TempSelectionAreaPoly.Add(new System.Drawing.PointF((float)pos.X, (float)pos.Y));
+                        
+                            RefreshSelection();
+                        
+                    }else if (ptrPt.Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
+                    {
+                        if (TempSelectionAreaPoly.Count > 2)
+                        {
+                            SelectionAreaPoly = TempSelectionAreaPoly.Select(x=>x).ToList();
+                            TempSelectionAreaPoly.Clear();
+                            ChkSelectArea.IsChecked = false;
+                            RefreshSelection();
+                            //create selection area
+                            selectPoly.Clear();
+
+                            foreach (var pointArea in SelectionAreaPoly)
+                            {
+                                //cropping sesuai selection area
+                                var ratioX = (double)pointArea.X / ImgWidth;
+                                var ratioY = (double)pointArea.Y / ImgHeight;
+                                //var ratioWidth = (double)SelectionArea.Width / ImgWidth;
+                                //var ratioHeight = (double)SelectionArea.Height / ImgHeight;
+                                selectPoly.Add(new PointF((float)(ratioX * ImgWidth), (float)(ratioY * ImgHeight)));
+
+                            }
+
+                            
+                        }
+                    }
                 }
-                /*
-                else if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
-                {
-                    SelectionArea.X = 0;
-                    SelectionArea.Y = 0;
-                    SelectionArea.Width = 0;
-                    SelectionArea.Height = 0;
-                }*/
+                
+                
             };
             dataCounterService = ObjectContainer.Get<DataCounterService>();
             if (PushTimer == null)
@@ -205,6 +213,49 @@ namespace CamObserver.UWP
 
         void RefreshSelection()
         {
+            OverlayCanvas2.Children.Clear();
+            if (TempSelectionAreaPoly.Count > 1) 
+            {
+                for (int i = 0; i < TempSelectionAreaPoly.Count - 1; i++)
+                {
+                    var p1 = TempSelectionAreaPoly[i];
+                    var p2 = TempSelectionAreaPoly[i + 1];
+                    var line = new Line()
+                    {
+                        X1 = p1.X,
+                        Y1 = p1.Y,
+                        X2 = p2.X,
+                        Y2 = p2.Y,
+                        Stroke = new SolidColorBrush(Colors.Red),
+                        StrokeThickness = 2
+                    };
+                    OverlayCanvas2.Children.Add(line);
+                }
+            }else if (TempSelectionAreaPoly.Count==1)
+            {
+                var ellipse1 = new Ellipse();
+                ellipse1.Fill = new SolidColorBrush(Windows.UI.Colors.Red);
+                ellipse1.Width = 5;
+                ellipse1.Height = 5;
+                Canvas.SetLeft(ellipse1, TempSelectionAreaPoly.First().X);
+                Canvas.SetTop(ellipse1, TempSelectionAreaPoly.First().Y);
+                OverlayCanvas2.Children.Add(ellipse1);
+            }
+            if (SelectionAreaPoly.Count > 1)
+            {
+                var poly = new Polygon();
+                poly.Points = new PointCollection();
+                SelectionAreaPoly.ForEach(x => poly.Points.Add(new Windows.Foundation.Point(x.X, x.Y)));
+
+                poly.Fill = new SolidColorBrush(Windows.UI.Colors.LightSkyBlue);
+                poly.Stroke = new SolidColorBrush(Windows.UI.Colors.DarkBlue);
+                poly.Opacity = 0.3;
+                poly.StrokeThickness = this._line_thickness;
+                //Canvas.SetLeft(selection, SelectionArea.X);
+                //Canvas.SetTop(selection, SelectionArea.Y);
+                this.OverlayCanvas2.Children.Add(poly);
+            }
+            /*
             if (selection == null)
             {
                 OverlayCanvas2.Children.Clear();
@@ -227,7 +278,7 @@ namespace CamObserver.UWP
                 Canvas.SetLeft(selection, SelectionArea.X);
                 Canvas.SetTop(selection, SelectionArea.Y);
 
-            }
+            }*/
             AppConstants.SelectionArea = JsonSerializer.Serialize(SelectionArea);
         }
 
@@ -356,17 +407,7 @@ namespace CamObserver.UWP
 
                 processing = true;
 
-                if (SelectionArea.Width > 0 && SelectionArea.Height > 0)
-                {
-                    //cropping sesuai selection area
-                    var ratioX = (double)SelectionArea.X / ImgWidth;
-                    var ratioY = (double)SelectionArea.Y / ImgHeight;
-                    var ratioWidth = (double)SelectionArea.Width / ImgWidth;
-                    var ratioHeight = (double)SelectionArea.Height / ImgHeight;
-
-                    selectRect = new System.Drawing.Rectangle((int)(ratioX * ImgWidth), (int)(ratioY * ImgHeight), (int)(ratioWidth * ImgWidth), (int)(ratioHeight * ImgHeight));
-
-                }
+                
                 switch (Mode)
                 {
                     case StreamSourceTypes.RTSP:
@@ -384,7 +425,7 @@ namespace CamObserver.UWP
 
                 if (frame != null)
                 {
-                    var results = await _model.EvaluateFrame(frame, selectRect);
+                    var results = await _model.EvaluateFrame(frame, selectPoly);
                     Log($"detected objects : {results.Count}");
                     await DrawBoxes5(results, frame, _model.GetTracker());
                     count++;

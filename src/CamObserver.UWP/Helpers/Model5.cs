@@ -76,7 +76,7 @@ namespace CamObserver.UWP.Helpers
 
         HashSet<ObjectKind> Filter = new HashSet<ObjectKind> {   };
         //
-        public async Task<List<ObjectDetectorResult>> EvaluateFrame(VideoFrame frame, Rectangle selectRect)
+        public async Task<List<ObjectDetectorResult>> EvaluateFrame(VideoFrame frame, List<PointF> selectArea)
         {
 
             try
@@ -99,7 +99,7 @@ namespace CamObserver.UWP.Helpers
                     {
                         results2.Add(new Result(new float[] { (float)(item.Rect.X * ImageWidth), (float)(item.Rect.Y * ImageHeight), (float)((item.Rect.X+item.Rect.Width) * ImageWidth), (float)((item.Rect.Y+item.Rect.Height) * ImageHeight) }, item.Kind.ToString(), item.Confidence));
                     }
-                    tracker.Process(results2, selectRect);
+                    tracker.Process(results2, selectArea);
                 }
                 //var bmp = DrawResults.Draw(results, image, tracker);
                 //return bmp;

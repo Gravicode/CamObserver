@@ -27,6 +27,8 @@
                 <local_controls:DeviceComboBox Margin="10,10,10,10" Height="40" x:Name="DeviceComboBox"/>
                 <CheckBox x:Name="ChkAutoPush" Margin="10,10,10,10" Content="Auto Push Data" IsChecked="True"></CheckBox>
                 <CheckBox x:Name="ChkAutoStart" Margin="10,10,10,10" Content="Auto Start" Unchecked="ChkAutoStart_Unchecked" Checked="ChkAutoStart_Checked"></CheckBox>
+                <CheckBox x:Name="ChkSelectArea" Margin="10,10,10,10" Content="Select Area" ></CheckBox>
+                <Button x:Name="BtnClearArea" Margin="10,10,10,10" Content="Clear Selection"></Button>
             </StackPanel>
         </AppBar>
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" >

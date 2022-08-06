@@ -84,7 +84,7 @@ namespace CamObserver.UWP.Helpers
             var decoder = await BitmapDecoder.CreateAsync(stream);
             return await decoder.GetSoftwareBitmapAsync();
         }
-        public async Task<List<Result>> EvaluateFrame(VideoFrame frame, Rectangle selectRect)
+        public async Task<List<Result>> EvaluateFrame(VideoFrame frame, List<PointF> selectRect)
         {
             
             var output = await Model.EvaluateAsync(frame);

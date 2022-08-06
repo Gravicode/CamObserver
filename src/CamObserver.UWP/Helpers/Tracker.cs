@@ -137,8 +137,9 @@ namespace CamObserver.UWP.Helpers
             }
         }*/
 
-        public void Process(IReadOnlyList<Result> Targets,Rectangle SelectArea)
+        public void Process(IReadOnlyList<Result> Targets,List<PointF> SelectArea)
         {
+            
             HashSet<string> Existing = new HashSet<string>();
             bool IsAdded = false;
             foreach (var newItem in Targets)
@@ -171,7 +172,7 @@ namespace CamObserver.UWP.Helpers
             //count
             foreach(var item in TrackedList)
             {
-                if(SelectArea.Contains(new Point((int) item.Location.X, (int)item.Location.Y)) && !item.HasBeenCounted)
+                if(SelectArea.IsInside(item.Location) && !item.HasBeenCounted)
                 {
                     var newRow = table.NewRow();
                     newRow["No"] = table.Rows.Count + 1;
@@ -208,5 +209,35 @@ namespace CamObserver.UWP.Helpers
             var distance = Math.Sqrt((Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2)));
             return distance;
         }
+
+        
     }
+    public static class PolygonHelper
+    {
+        /// <summary>
+        /// check if point is inside polygon
+        /// </summary>
+        /// <param name="polygon"></param>
+        /// <param name="testPoint"></param>
+        /// <returns></returns>
+        public static bool IsInside(this List<PointF> polygon, PointF testPoint)
+        {
+            bool result = false;
+            if (polygon.Count <= 0) return false;
+            int j = polygon.Count() - 1;
+            for (int i = 0; i < polygon.Count(); i++)
+            {
+                if (polygon[i].Y < testPoint.Y && polygon[j].Y >= testPoint.Y || polygon[j].Y < testPoint.Y && polygon[i].Y >= testPoint.Y)
+                {
+                    if (polygon[i].X + (testPoint.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) * (polygon[j].X - polygon[i].X) < testPoint.X)
+                    {
+                        result = !result;
+                    }
+                }
+                j = i;
+            }
+            return result;
+        }
+    }
+    
 }
