@@ -201,6 +201,32 @@ namespace CamObserver.Models
         public string? Tags { get; set; }
     }
     [DataContract]
+    public class WeatherData
+    {
+        [DataMember(Order = 1)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key, Column(Order = 0)]
+        public long Id { get; set; }
+        [DataMember(Order = 2)]
+        public DateTime Tanggal { get; set; }
+        [DataMember(Order = 3)]
+        public double WindSpeedAverage { get; set; }
+        [DataMember(Order = 4)]
+        public double WindDirection { get; set; }
+        [DataMember(Order = 5)]
+        public double WindSpeedMax { get; set; }
+        [DataMember(Order = 6)]
+        public double RainfallOneHour { get; set; }
+        [DataMember(Order = 7)]
+        public double RainfallOneDay { get; set; }
+        [DataMember(Order = 8)]
+        public double Temperature { get; set; }
+        [DataMember(Order = 9)]
+        public double Humidity { get; set; }
+        [DataMember(Order = 10)]
+        public double BarPressure { get; set; }
+    }
+    [DataContract]
     public class UserProfile
     {
         [DataMember(Order = 1)]

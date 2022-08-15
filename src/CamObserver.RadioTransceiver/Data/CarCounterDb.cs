@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CamObserver.Web.Data;
+using CamObserver.RadioTransceiver.Data;
 
-namespace CamObserver.Web.Data
+namespace CamObserver.RadioTransceiver.Data
 {
     public class CamObserverDB : DbContext
     {

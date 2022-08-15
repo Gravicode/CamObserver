@@ -45,6 +45,7 @@ builder.Services.AddSingleton<UserProfileService>();
 builder.Services.AddTransient<GatewayService>();
 builder.Services.AddTransient<CCTVService>();
 builder.Services.AddTransient<DataCounterService>();
+builder.Services.AddTransient<WeatherDataService>();
 builder.Services.AddTransient<UserProfileService>();
 
 builder.Services.AddCors(options =>
