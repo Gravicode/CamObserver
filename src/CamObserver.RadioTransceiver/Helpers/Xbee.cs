@@ -67,7 +67,7 @@ namespace CamObserver.RadioTransceiver.Helpers
         void Uart_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             SerialPort sp = (SerialPort)sender;
-            string dataStr = sp.ReadExisting();
+            string dataStr = sp.ReadLine();
             Console.WriteLine("Data Received:");
             Console.Write(dataStr);
             DataReceived?.Invoke(this, new DataReceivedEventArgs() { Data = dataStr });

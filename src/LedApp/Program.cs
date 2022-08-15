@@ -31,6 +31,7 @@ namespace LedApp
         static MqttClient mqtt;
         public static void Main()
         {
+            /*
             try
             {
                 // Get the first WiFI Adapter
@@ -52,6 +53,10 @@ namespace LedApp
             {
                 Debug.WriteLine("message:" + ex.Message);
                 Debug.WriteLine("stack:" + ex.StackTrace);
+            }
+            while (!IsConnected)
+            {
+                Thread.Sleep(100);
             }
             if(IsConnected)
             {
@@ -75,7 +80,7 @@ namespace LedApp
                     return;
                 }
 
-            }
+            }*/
             var sensorCuaca = new WeatherSensor();
             sensorCuaca.StartSensing();
             /*
@@ -280,7 +285,7 @@ namespace LedApp
 
         public void StartSensing()
         {
-            if (th1 != null)
+            if (th1 == null)
             {
                 th1 = new Thread(new ThreadStart(Loop));
                 th1.Start();

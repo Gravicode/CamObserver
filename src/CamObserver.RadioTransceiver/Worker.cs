@@ -19,19 +19,29 @@ namespace CamObserver.RadioTransceiver
             xbee.DataReceived += Xbee_DataReceived;
             _logger = logger;
             weatherDataService = new WeatherDataService();
-            dataCounterService = new ();
+            dataCounterService = new();
             Console.WriteLine("Cam Observer - Radio Transreceiver Service is running");
         }
 
         private void Xbee_DataReceived(object sender, Xbee.DataReceivedEventArgs e)
         {
             if (string.IsNullOrEmpty(e.Data)) return;
+
             var obj = JsonConvert.DeserializeObject<SensorData>(e.Data);
             if (obj != null)
             {
-                var newItem = new WeatherData() { BarPressure = obj.BarPressure, Humidity = obj.Humidity, RainfallOneDay=obj.RainfallOneDay,
-                 RainfallOneHour = obj.RainfallOneHour, Tanggal=DateTime.Now, Temperature = 
-                 obj.Temperature, WindDirection = obj.WindDirection , WindSpeedAverage= obj.WindSpeedAverage, WindSpeedMax= obj.WindSpeedMax
+                var newItem = new WeatherData()
+                {
+                    BarPressure = obj.BarPressure,
+                    Humidity = obj.Humidity,
+                    RainfallOneDay = obj.RainfallOneDay,
+                    RainfallOneHour = obj.RainfallOneHour,
+                    Tanggal = DateTime.Now,
+                    Temperature =
+                 obj.Temperature,
+                    WindDirection = obj.WindDirection,
+                    WindSpeedAverage = obj.WindSpeedAverage,
+                    WindSpeedMax = obj.WindSpeedMax
                 };
                 var res = weatherDataService.InsertData(newItem);
                 if (res)
@@ -39,6 +49,8 @@ namespace CamObserver.RadioTransceiver
                     _logger.LogInformation($"[{DateTimeOffset.Now}] - Data received and inserted to DB: {e.Data}");
                 }
             }
+
+
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

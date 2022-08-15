@@ -18,7 +18,7 @@ namespace CamObserver.Device
         public event DataReceivedEventHandler DataReceived;
 
         bool IsInit = false;
-        
+        string MessageQue = string.Empty;
         UartController uart;
         public Xbee(string ComPort = SC13048.UartPort.Uart2)
         {
@@ -68,10 +68,26 @@ namespace CamObserver.Device
         {
             var readbuffer = new byte[e.Count];
             var bytesReceived = uart.Read(readbuffer, 0, e.Count);
+            
             var dataStr = Encoding.UTF8.GetString(readbuffer, 0, bytesReceived);
-            Debug.WriteLine(dataStr);
-            DataReceived?.Invoke(this, new DataReceivedEventArgs() { Data = dataStr });
+            //Debug.WriteLine(dataStr);
+            //DataReceived?.Invoke(this, new DataReceivedEventArgs() { Data = MessageQue });
+           
+            
+            MessageQue += dataStr;
+            if(Utils.Contains(dataStr, new string(new char[] { '\n' })))
+            {
+                Debug.WriteLine(MessageQue);
+                DataReceived?.Invoke(this, new DataReceivedEventArgs() { Data = MessageQue });
+                MessageQue = string.Empty;
+            }
+            if (MessageQue.Length > 300) MessageQue = string.Empty;
 
         }
     }
 }
+
+
+
+
+
