@@ -7,6 +7,11 @@ using System.Threading;
 
 namespace CamObserver.Device
 {
+    public class CounterData
+    {
+        public long Person { get; set; }
+        public long Bicycle { get; set; }
+    }
     public class SensorData
     {
         public double WindSpeedAverage { get; set; }

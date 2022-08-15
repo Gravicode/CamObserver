@@ -38,7 +38,7 @@ namespace CamObserver.UWP
     public sealed partial class CctvPage : Page, IDisposable
     {
         public enum StreamSourceTypes { WebCam, RTSP, HttpImage }
-        StreamSourceTypes Mode = StreamSourceTypes.WebCam;
+        StreamSourceTypes Mode = StreamSourceTypes.RTSP;
 
         PointF StartLocation;
         bool IsSelect = false;

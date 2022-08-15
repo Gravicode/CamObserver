@@ -10,7 +10,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Threading;
-
+using Json.NETMF;
 namespace CamObserver.Device
 {
     internal class Program
@@ -23,7 +23,7 @@ namespace CamObserver.Device
         const int cols = 32;
         const int rows = 8;
         static int pct = 0;
-
+        static CounterData CurrentCounter;
         private static void Main()
         {
             var spi = SpiController.FromName(SC13048.SpiBus.Spi1);
@@ -65,39 +65,73 @@ namespace CamObserver.Device
             screen.DrawLine((uint)Color.White.ToArgb(), 10, 127, 150, 127);
             screen.SetPixel(80, 92, (uint)Color.White.ToArgb());
 
-            screen.DrawString("Hello world!", (uint) Color.Blue.ToArgb(), 50, 110);
+            screen.DrawString("Cam Observer 1.0", (uint) Color.Blue.ToArgb(), 50, 110);
 
             screen.Flush();
 
             var sensorCuaca = new WeatherSensor();
             sensorCuaca.StartSensing();
 
-            var pin = GpioController.GetDefault().OpenPin(SC13048.GpioPin.PB2);
-            var matrix = new LedMatrix(pin, MATRIX_HEIGHT, MATRIX_WIDTH);
-
-            matrix.Clear();
-
+            //var BarPin = GpioController.GetDefault().OpenPin(SC13048.GpioPin.PB2);
+            var InfoPin = GpioController.GetDefault().OpenPin(SC13048.GpioPin.PB2);
+            //var BarMatrix = new LedMatrix(BarPin, MATRIX_HEIGHT, MATRIX_WIDTH);
+            var InfoMatrix = new LedMatrix(InfoPin, MATRIX_HEIGHT, MATRIX_WIDTH);
+            CurrentCounter = new CounterData() { Bicycle=0, Person=0 };
+            var xbee = new Xbee(SC13048.UartPort.Uart1);
+            xbee.DataReceived += (s, o) =>
+            {
+                if (!string.IsNullOrEmpty(o.Data))
+                {
+                    var dict = JsonSerializer.DeserializeString(o.Data) as Hashtable;
+                    if(dict!=null)
+                    foreach(var item in dict.Keys)
+                    {
+                        if (item == "Person")
+                        {
+                            CurrentCounter.Person = (long)dict[item] ;
+                        }else 
+                        if (item == "Bicycle")
+                        {
+                            CurrentCounter.Bicycle = (long)dict[item];
+                        }
+                    }
+                }
+            };
+            //BarMatrix.Clear();
+          
+            /*
             Thread threadMatrix = new Thread(new ThreadStart(() => {
                 
                 while (true)
                 {
                     pct++;
-                    matrix.SetLevel(pct);
+                    BarMatrix.SetLevel(pct);
                     if (pct >= 100)
                     {
                         pct = 0;
-                        matrix.Clear();
+                        BarMatrix.Clear();
                     }
                     Thread.Sleep(100);
                 }
             }));
             threadMatrix.Start();
+            */
+            const int MaxInfo= 9;
+            Random rnd = new Random();
+            int InfoCounter = 0;
+
             while (true)
             {
                 var current = sensorCuaca.GetCurrentData();
                 if (current != null)
                 {
                     screen.Clear();
+                    InfoMatrix.Clear();
+                    CurrentCounter.Person = rnd.Next(1000);
+                    CurrentCounter.Bicycle = rnd.Next(1000);
+                    var jsonToken = JsonSerializer.SerializeObject(current);
+                    var json = jsonToken.ToString();
+                    xbee.SendMessage(json);                    
                     screen.DrawString($"Temp: {current.Temperature}", (uint)Color.Blue.ToArgb(), 10, 10);
                     screen.DrawString($"Wind Dir: {current.WindDirection}", (uint)Color.Blue.ToArgb(), 10, 20);
                     screen.DrawString($"Wind Speed: {current.WindSpeedAverage}", (uint)Color.Blue.ToArgb(), 10, 30);
@@ -106,7 +140,39 @@ namespace CamObserver.Device
                     screen.DrawString($"Barometer: {current.BarPressure}", (uint)Color.Blue.ToArgb(), 10, 60);
                     screen.DrawString($"Humid: {current.Humidity}", (uint)Color.Blue.ToArgb(), 10, 70);
                     screen.DrawString($"Persen: {pct} %", (uint)Color.Blue.ToArgb(), 10, 80);
-
+                    switch (InfoCounter)
+                    {
+                        case 0:
+                            InfoMatrix.DrawString($"Temp: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(),0,0);
+                            break; 
+                        case 1:
+                            InfoMatrix.DrawString($"ARAH ANGIN: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(),0,0);
+                            break;  
+                        case 2:
+                            InfoMatrix.DrawString($"KEC ANGIN: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(),0,0);
+                            break;
+                        case 3:
+                            InfoMatrix.DrawString($"HUJAN 1HARI: {current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
+                            break;
+                        case 4:
+                            InfoMatrix.DrawString($"HUJAN 1JAM: {current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
+                            break;
+                        case 5:
+                            InfoMatrix.DrawString($"BAROMETER: {current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
+                            break;
+                        case 6:
+                            InfoMatrix.DrawString($"HUMID: {current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
+                            break; 
+                        case 7:
+                            InfoMatrix.DrawString($"ORANG: {CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
+                            break;    
+                        case 8:
+                            InfoMatrix.DrawString($"SEPEDA: {CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                            break;
+                    }
+                    InfoMatrix.Flush();
+                    InfoCounter++;
+                    if (InfoCounter >= MaxInfo) InfoCounter = 0;
                     screen.Flush();
                 }
 
@@ -138,5 +204,6 @@ namespace CamObserver.Device
             lcd.DrawBufferNative(this.Buffer);
         }
     }
+    
 
 }
