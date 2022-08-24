@@ -10,7 +10,8 @@ namespace CamObserver.Device
 {
     public class LedMatrix : BasicGraphics
     {
-        private uint row, column;
+        public uint row { get; private set; }
+        public uint column { get; private set; }
         WS2812Controller leds;
 
         public LedMatrix(GpioPin pin, uint column, uint row)

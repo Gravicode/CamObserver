@@ -22,7 +22,7 @@ namespace CamObserver.Device
         private const int SCREEN_WIDTH = 160;
         private const int SCREEN_HEIGHT = 128;
         const int MATRIX_WIDTH = rows;
-        const int MATRIX_HEIGHT = cols * 1;
+        const int MATRIX_HEIGHT = cols * 2;
         const int cols = 32;
         const int rows = 8;
         static int pct = 0;
@@ -256,8 +256,12 @@ namespace CamObserver.Device
 
                 //var BarPin = GpioController.GetDefault().OpenPin(SC13048.GpioPin.PB2);
                 var InfoPin = GpioController.GetDefault().OpenPin(SC20260.GpioPin.PA0);
+                var InfoPin2 = GpioController.GetDefault().OpenPin(SC20260.GpioPin.PB0);
                 //var BarMatrix = new LedMatrix(BarPin, MATRIX_HEIGHT, MATRIX_WIDTH);
                 var InfoMatrix = new LedMatrix(InfoPin, MATRIX_HEIGHT, MATRIX_WIDTH);
+                var InfoMatrix2 = new LedMatrix(InfoPin2, MATRIX_HEIGHT, MATRIX_WIDTH);
+                var infoBox = new InfoBox(InfoMatrix2);
+                infoBox.StartAnimation();
                 CurrentCounter = new CounterData() { Bicycle = 0, Person = 0 };
                 var xbee = new Xbee(SC20260.UartPort.Uart2);
                 xbee.DataReceived += (s, o) =>
@@ -376,7 +380,200 @@ namespace CamObserver.Device
         
             Thread.Sleep(Timeout.Infinite);
         }
+       
+    }
 
+    public class InfoBox
+    {
+        int cols;
+        int rows;
+        Random rnd;
+        LedMatrix screen;
+        public InfoBox(LedMatrix screen)
+        {
+            
+            this.cols = (int)screen.column;
+            this.rows = (int)screen.row;
+            this.rnd = new Random();
+            this.screen = screen;
+        }
+
+        Thread th1;
+
+        public void StartAnimation()
+        {
+            if (th1 == null)
+            {
+                th1 = new Thread(new ThreadStart(Animation));
+                th1.Start();
+            }
+        }
+        void Animation()
+        {
+            string[] words = { "WILUJENG", "SUMPING" };
+            string[] words2 = { "BOGOR", "TEGAR", "BERIMAN" };
+            string[] words3 = { "SELAMAT", "BEROLAHRAGA", "SEMANGAT !!", };
+            string[] words4 = { "HIDUP", "SEHAT", "SELALU" };
+            while (true)
+            {
+                CountDownAnimation(0, 100, 1);
+                BrickAnimation();
+                CharAnimation(words);
+                LineAnimation();
+                CharAnimation(words2);
+                LineAnimation2();
+                CharAnimation(words3);
+                LineAnimation();
+                CharAnimation(words4);
+                LineAnimation2();
+                BallAnimation(200);
+            }
+        }
+        void BrickAnimation(int Moves = 16 * 4, int Delay = 100)
+        {
+            screen.Clear();
+            var col = LedMatrix.ColorFromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
+            var MaxX = cols / 2;
+            var MaxY = rows / 2;
+            int x, y;
+            for (int i = 0; i < Moves; i++)
+            {
+                x = rnd.Next(MaxX);
+                y = rnd.Next(MaxY);
+                screen.DrawRectangle(col, x * 2, y * 2, 2, 2);
+                screen.Flush();
+                Thread.Sleep(Delay);
+                col = LedMatrix.ColorFromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
+
+            }
+        }
+        void BallAnimation(int Moves = 1000, int Delay = 50)
+        {
+            var x = rnd.Next(cols);
+            var y = rnd.Next(rows);
+            var ax = 1 + rnd.Next(2);
+            var ay = 1 + rnd.Next(2);
+            screen.Clear();
+            var col = LedMatrix.ColorFromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
+            var current = 0;
+            while (current < Moves)
+            {
+
+                screen.Clear();
+                screen.DrawCircle(col, x, y, 1);
+                screen.Flush();
+                Thread.Sleep(Delay);
+                x += ax;
+                y += ay;
+                if (x + ax > cols || x < 0)
+                {
+                    ax = -ax;
+                }
+                if (ay + y > rows || y < 0)
+                {
+                    ay = -ay;
+                }
+                current++;
+            }
+        }
+        void LineAnimation2(int Delay = 10)
+        {
+            screen.Clear();
+            var col = LedMatrix.ColorFromRgb(0, 20, 50);
+            var rnd = new Random();
+            for (int x = 0; x < cols; x++)
+            {
+                col = LedMatrix.ColorFromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
+                if (x % 2 == 0)
+                {
+                    for (int y = 0; y < rows; y++)
+                    {
+                        screen.SetPixel(x, y, col);
+                        screen.Flush();
+                        Thread.Sleep(Delay);
+                    }
+                }
+                else
+                {
+                    for (int y = rows - 1; y >= 0; y--)
+                    {
+                        screen.SetPixel(x, y, col);
+                        screen.Flush();
+                        Thread.Sleep(Delay);
+                    }
+                }
+            }
+        }
+        void LineAnimation(int Delay = 10)
+        {
+            screen.Clear();
+            var col = LedMatrix.ColorFromRgb(0, 20, 50);
+            var rnd = new Random();
+            for (int y = 0; y < rows; y++)
+            {
+                col = LedMatrix.ColorFromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
+                if (y % 2 == 0)
+                {
+                    for (int x = 0; x < cols; x++)
+                    {
+                        screen.SetPixel(x, y, col);
+                        screen.Flush();
+                        Thread.Sleep(Delay);
+                    }
+                }
+                else
+                {
+                    for (int x = cols - 1; x >= 0; x--)
+                    {
+                        screen.SetPixel(x, y, col);
+                        screen.Flush();
+                        Thread.Sleep(Delay);
+                    }
+                }
+            }
+        }
+        void CharAnimation(string[] Words, int Delay = 500)
+        {
+            screen.Clear();
+            var col = LedMatrix.ColorFromRgb(0, 20, 50);
+
+
+            foreach (var word in Words)
+            {
+                col = LedMatrix.ColorFromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
+                var statement = string.Empty;
+                for (int i = 0; i < word.Length; i++)
+                {
+                    statement += word[i];
+                    screen.Clear();
+                    screen.DrawString(statement.ToString(), col, 0, 0);
+                    screen.Flush();
+                    Thread.Sleep(Delay);
+                }
+            }
+        }
+        void CountDownAnimation(int From, int To, int Incr)
+        {
+            screen.Clear();
+            var col = LedMatrix.ColorFromRgb(0, 20, 50);
+
+
+            int current = From;
+            while (true)
+            {
+                screen.Clear();
+                screen.DrawString(current.ToString(), col, 0, 0);
+                screen.Flush();
+                Thread.Sleep(10);
+                if (current % 10 == 0)
+                {
+                    col = LedMatrix.ColorFromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
+                }
+                if (current >= Int32.MaxValue) current = 0;
+                if (current == To) break;
+                current += Incr;
+            }
+        }
     }
 
     public class BasicGraphicsImp : BasicGraphics

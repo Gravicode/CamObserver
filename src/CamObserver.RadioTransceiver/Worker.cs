@@ -26,29 +26,37 @@ namespace CamObserver.RadioTransceiver
         private void Xbee_DataReceived(object sender, Xbee.DataReceivedEventArgs e)
         {
             if (string.IsNullOrEmpty(e.Data)) return;
-
-            var obj = JsonConvert.DeserializeObject<SensorData>(e.Data);
-            if (obj != null)
+            try
             {
-                var newItem = new WeatherData()
+                var obj = JsonConvert.DeserializeObject<SensorData>(e.Data);
+                if (obj != null)
                 {
-                    BarPressure = obj.BarPressure,
-                    Humidity = obj.Humidity,
-                    RainfallOneDay = obj.RainfallOneDay,
-                    RainfallOneHour = obj.RainfallOneHour,
-                    Tanggal = DateTime.Now,
-                    Temperature =
-                 obj.Temperature,
-                    WindDirection = obj.WindDirection,
-                    WindSpeedAverage = obj.WindSpeedAverage,
-                    WindSpeedMax = obj.WindSpeedMax
-                };
-                var res = weatherDataService.InsertData(newItem);
-                if (res)
-                {
-                    _logger.LogInformation($"[{DateTimeOffset.Now}] - Data received and inserted to DB: {e.Data}");
+                    var newItem = new WeatherData()
+                    {
+                        BarPressure = obj.BarPressure,
+                        Humidity = obj.Humidity,
+                        RainfallOneDay = obj.RainfallOneDay,
+                        RainfallOneHour = obj.RainfallOneHour,
+                        Tanggal = DateTime.Now,
+                        Temperature =
+                     obj.Temperature,
+                        WindDirection = obj.WindDirection,
+                        WindSpeedAverage = obj.WindSpeedAverage,
+                        WindSpeedMax = obj.WindSpeedMax
+                    };
+                    var res = weatherDataService.InsertData(newItem);
+                    if (res)
+                    {
+                        _logger.LogInformation($"[{DateTimeOffset.Now}] - Data received and inserted to DB: {e.Data}");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+                //throw;
+            }
+            
 
 
         }
