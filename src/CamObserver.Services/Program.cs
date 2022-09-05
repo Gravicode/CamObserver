@@ -7,6 +7,8 @@ using System.Text;
 using Serilog;
 using CamObserver.Services.Extension;
 using CamObserver.Services.Controllers;
+using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -124,9 +126,18 @@ void ConfigureServices(IServiceCollection services, IConfiguration Configuration
                .AllowAnyHeader()
                .WithExposedHeaders("Grpc-Status", "Grpc-Message", "Grpc-Encoding", "Grpc-Accept-Encoding");
     }));
+
+    services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.KnownProxies.Add(IPAddress.Parse("103.189.234.66"));
+    });
 }
 void Configure(WebApplication app, IWebHostEnvironment env)
 {
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
     //if use GRPC Native
     // app.UseCors(x => x
     //.AllowAnyMethod()
