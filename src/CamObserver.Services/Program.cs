@@ -151,7 +151,7 @@ void Configure(WebApplication app, IWebHostEnvironment env)
     app.UseSwaggerUI();
     //}
 
-    app.UseHttpsRedirection();
+    //app.UseHttpsRedirection();
     app.UseStaticFiles();
 
     // grpc web
