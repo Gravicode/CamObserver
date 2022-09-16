@@ -10,5 +10,6 @@ namespace CamObserver.RadioTransceiver.Models
     {
         public long Person { get; set; }
         public long Bicycle { get; set; }
+        public string Message { get; set; }
     }
 }

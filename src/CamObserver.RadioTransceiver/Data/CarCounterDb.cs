@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using CamObserver.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CamObserver.RadioTransceiver.Data;
 
 namespace CamObserver.RadioTransceiver.Data
 {
@@ -19,6 +14,7 @@ namespace CamObserver.RadioTransceiver.Data
             : base(options)
         {
         }
+        public DbSet<InfoBox> InfoBoxs { get; set; }
         public DbSet<CCTV> CCTVs { get; set; }
         public DbSet<Gateway> Gateways { get; set; }
         public DbSet<DataCounter> DataCounters { get; set; }

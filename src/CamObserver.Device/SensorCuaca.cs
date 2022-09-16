@@ -11,6 +11,8 @@ namespace CamObserver.Device
     {
         public long Person { get; set; }
         public long Bicycle { get; set; }
+
+        public string Message { get; set; }
     }
     public class SensorData
     {

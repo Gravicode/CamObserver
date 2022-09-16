@@ -64,6 +64,12 @@ namespace CamObserver.Models
     {
 
     }
+     
+    [ServiceContract]
+    public interface IInfoBox : ICrudGrpc<InfoBox>
+    {
+
+    }
     
     [ServiceContract]
     public interface IUserProfile : ICrudGrpc<UserProfile>
@@ -256,7 +262,23 @@ namespace CamObserver.Models
         public Roles Role { set; get; } = Roles.User;
 
     }
+    [DataContract]
+    public class InfoBox
+    {
+        [DataMember(Order = 1)]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Key, Column(Order = 0)]
+        public long Id { get; set; }
+        [DataMember(Order = 2)]
+        public string Message { get; set; }
+        [DataMember(Order = 3)]
+        public bool IsActive { get; set; } = true;
+        
+        [DataMember(Order = 4)]
+        public DateTime? Created { get; set; } 
 
-    public enum Roles { Admin, User, Operator }
+
+    }
+        public enum Roles { Admin, User, Operator }
     #endregion
 }

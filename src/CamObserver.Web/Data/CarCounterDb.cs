@@ -19,6 +19,7 @@ namespace CamObserver.Web.Data
             : base(options)
         {
         }
+        public DbSet<InfoBox> InfoBoxs { get; set; }
         public DbSet<CCTV> CCTVs { get; set; }
         public DbSet<Gateway> Gateways { get; set; }
         public DbSet<DataCounter> DataCounters { get; set; }

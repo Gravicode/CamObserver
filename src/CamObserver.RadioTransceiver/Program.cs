@@ -5,6 +5,9 @@ IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
         services.AddHostedService<Worker>();
+        services.AddTransient<WeatherDataService>();
+        services.AddTransient<DataCounterService>();
+        services.AddTransient<InfoBoxService>();
     })
     .Build();
 var configBuilder = new ConfigurationBuilder()

@@ -45,11 +45,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamObserver.RadioTransceive
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{13736504-AD16-4D37-893E-AF4E1AC6142E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcContract", "GrpcContract\GrpcContract.csproj", "{8BE22F59-E52A-4C28-9B94-A880C88DAE92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcContract", "GrpcContract\GrpcContract.csproj", "{8BE22F59-E52A-4C28-9B94-A880C88DAE92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcServer", "GrpcServer\GrpcServer.csproj", "{B895850F-49E7-4F08-9417-F12C34C1CD47}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcServer", "GrpcServer\GrpcServer.csproj", "{B895850F-49E7-4F08-9417-F12C34C1CD47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcClient", "GrpcClient\GrpcClient.csproj", "{929B5405-3DDA-4ABE-88D6-32F2E6DD79DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcClient", "GrpcClient\GrpcClient.csproj", "{929B5405-3DDA-4ABE-88D6-32F2E6DD79DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

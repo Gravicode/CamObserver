@@ -13,13 +13,16 @@ namespace CamObserver.RadioTransceiver
         static Xbee xbee;
         WeatherDataService weatherDataService;
         DataCounterService dataCounterService;
-        public Worker(ILogger<Worker> logger)
+        InfoBoxService infoBoxService;
+        public Worker(ILogger<Worker> logger, WeatherDataService weatherDataService, DataCounterService dataCounterService, InfoBoxService infoBoxService)
         {
             xbee = new Xbee(AppConstants.COM_PORT);
             xbee.DataReceived += Xbee_DataReceived;
             _logger = logger;
-            weatherDataService = new WeatherDataService();
-            dataCounterService = new();
+            this.weatherDataService = weatherDataService;
+            this.dataCounterService = dataCounterService;
+            this.infoBoxService = infoBoxService;
+            
             Console.WriteLine("Cam Observer - Radio Transreceiver Service is running");
         }
 

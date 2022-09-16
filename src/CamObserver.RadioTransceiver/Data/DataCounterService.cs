@@ -32,7 +32,8 @@ namespace CamObserver.RadioTransceiver.Data
             {
                 var person = db.DataCounters.Where(x => x.Objek == "person").Count();
                 var bicycle = db.DataCounters.Where(x => x.Objek == "bicycle").Count();
-                var newItem = new Models.CounterInfo() { Bicycle = bicycle, Person = person };
+                var pesan = db.InfoBoxs.Where(x => x.IsActive).OrderByDescending(x => x.Created).FirstOrDefault();
+                var newItem = new Models.CounterInfo() { Bicycle = bicycle, Person = person, Message = pesan.Message };
                 return newItem;
             }
             catch (Exception ex)

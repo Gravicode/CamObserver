@@ -17,7 +17,6 @@ namespace CamObserver.Device
 {
     internal class Program
     {
-        static bool IsSc13040;
         private static ST7735Controller st7735;
         private const int SCREEN_WIDTH = 160;
         private const int SCREEN_HEIGHT = 128;
@@ -27,10 +26,12 @@ namespace CamObserver.Device
         const int rows = 8;
         static int pct = 0;
         static CounterData CurrentCounter;
+        public enum Chips { SC20100, SC20260, SC13040 };
+        static Chips MyChip = Chips.SC20100;
         private static void Main()
         {
-            IsSc13040 = false;
-            if (IsSc13040)
+
+            if (MyChip == Chips.SC13040)
             {
                 var spi = SpiController.FromName(SC13048.SpiBus.Spi1);
                 var gpio = GpioController.GetDefault();
@@ -39,7 +40,7 @@ namespace CamObserver.Device
                     spi.GetDevice(ST7735Controller.GetConnectionSettings
                     (SpiChipSelectType.Gpio, gpio.OpenPin(SC13048.GpioPin.PB14))), //CS pin.
                     gpio.OpenPin(SC13048.GpioPin.PA14), //RS pin.
-                    gpio.OpenPin(SC20100.GpioPin.PA13) //RESET pin.
+                    gpio.OpenPin(SC13048.GpioPin.PA13) //RESET pin.
                 );
 
                 var backlight = gpio.OpenPin(SC13048.GpioPin.PB13);
@@ -75,7 +76,7 @@ namespace CamObserver.Device
 
                 screen.Flush();
 
-                var sensorCuaca = new WeatherSensor();
+                var sensorCuaca = new WeatherSensor(SC13048.UartPort.Uart2);
                 sensorCuaca.StartSensing();
 
                 //var BarPin = GpioController.GetDefault().OpenPin(SC13048.GpioPin.PB2);
@@ -132,13 +133,14 @@ namespace CamObserver.Device
                     var current = sensorCuaca.GetCurrentData();
                     if (current != null)
                     {
-                        screen.Clear();
+                        //screen.Clear();
                         InfoMatrix.Clear();
                         CurrentCounter.Person = rnd.Next(1000);
                         CurrentCounter.Bicycle = rnd.Next(1000);
                         var jsonToken = JsonSerializer.SerializeObject(current);
                         var json = jsonToken.ToString();
                         xbee.SendMessage(json);
+
                         screen.DrawString($"Temp: {current.Temperature}", (uint)Color.Blue.ToArgb(), 10, 10);
                         screen.DrawString($"Wind Dir: {current.WindDirection}", (uint)Color.Blue.ToArgb(), 10, 20);
                         screen.DrawString($"Wind Speed: {current.WindSpeedAverage}", (uint)Color.Blue.ToArgb(), 10, 30);
@@ -147,6 +149,7 @@ namespace CamObserver.Device
                         screen.DrawString($"Barometer: {current.BarPressure}", (uint)Color.Blue.ToArgb(), 10, 60);
                         screen.DrawString($"Humid: {current.Humidity}", (uint)Color.Blue.ToArgb(), 10, 70);
                         screen.DrawString($"Persen: {pct} %", (uint)Color.Blue.ToArgb(), 10, 80);
+
                         switch (InfoCounter)
                         {
                             case 0:
@@ -187,7 +190,7 @@ namespace CamObserver.Device
                     Thread.Sleep(2000);
                 }
             }
-            else
+            else if (MyChip == Chips.SC20260)
             {
                 GpioPin backlight = GpioController.GetDefault().OpenPin(SC20260.GpioPin.PA15);
                 backlight.SetDriveMode(GpioPinDriveMode.Output);
@@ -289,7 +292,7 @@ namespace CamObserver.Device
                         {
                             Debug.WriteLine(ex.ToString());
                         }
-                      
+
                     }
                 };
                 //BarMatrix.Clear();
@@ -327,12 +330,12 @@ namespace CamObserver.Device
                         var jsonToken = JsonSerializer.SerializeObject(current);
                         var json = jsonToken.ToString();
                         xbee.SendMessage(json);
-                      
-                        screen.DrawString($"Temp: {current.Temperature}",font, solid, 10, 10);
-                        screen.DrawString($"Wind Dir: {current.WindDirection}",  font, solid, 10, 20);
+
+                        screen.DrawString($"Temp: {current.Temperature}", font, solid, 10, 10);
+                        screen.DrawString($"Wind Dir: {current.WindDirection}", font, solid, 10, 20);
                         screen.DrawString($"Wind Speed: {current.WindSpeedAverage}", font, solid, 10, 30);
                         screen.DrawString($"Rain 1d: {current.RainfallOneDay}", font, solid, 10, 40);
-                        screen.DrawString($"Rain 1h: {current.RainfallOneHour}",font, solid, 10, 50);
+                        screen.DrawString($"Rain 1h: {current.RainfallOneHour}", font, solid, 10, 50);
                         screen.DrawString($"Barometer: {current.BarPressure}", font, solid, 10, 60);
                         screen.DrawString($"Humid: {current.Humidity}", font, solid, 10, 70);
                         screen.DrawString($"Persen: {pct} %", font, solid, 10, 80);
@@ -376,11 +379,142 @@ namespace CamObserver.Device
                     Thread.Sleep(2000);
                 }
             }
-          
-        
-            Thread.Sleep(Timeout.Infinite);
+            else if (MyChip == Chips.SC20100)
+            {
+
+                var gpio = GpioController.GetDefault();
+
+                var sensorCuaca = new WeatherSensor(SC20100.UartPort.Uart5); //pb12,pb13
+                sensorCuaca.StartSensing();
+
+                //var BarPin = GpioController.GetDefault().OpenPin(SC13048.GpioPin.PB2);
+                var InfoPin = GpioController.GetDefault().OpenPin(SC20100.GpioPin.PC8);
+                var InfoPin2 = GpioController.GetDefault().OpenPin(SC20100.GpioPin.PC9);
+                //var BarMatrix = new LedMatrix(BarPin, MATRIX_HEIGHT, MATRIX_WIDTH);
+                var InfoMatrix = new LedMatrix(InfoPin, MATRIX_HEIGHT, MATRIX_WIDTH);
+                var InfoMatrix2 = new LedMatrix(InfoPin2, MATRIX_HEIGHT, MATRIX_WIDTH);
+                var infoBox = new InfoBox(InfoMatrix2);
+                infoBox.StartAnimation();
+                CurrentCounter = new CounterData() { Bicycle = 0, Person = 0 };
+                var xbee = new Xbee(SC20100.UartPort.Uart1); //pa 10, pa 9
+                xbee.DataReceived += (s, o) =>
+                {
+                    if (!string.IsNullOrEmpty(o.Data))
+                    {
+                        try
+                        {
+                            var dict = JsonSerializer.DeserializeString(o.Data) as Hashtable;
+                            if (dict != null)
+                                foreach (var item in dict.Keys)
+                                {
+                                    if (item == "Person")
+                                    {
+                                        CurrentCounter.Person = (long)dict[item];
+                                    }
+                                    else
+                                    if (item == "Bicycle")
+                                    {
+                                        CurrentCounter.Bicycle = (long)dict[item];
+                                    }
+                                    else
+                                    if (item == "Message")
+                                    {
+                                        infoBox.Pesan = (string)dict[item];
+                                    }
+                                }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex.ToString());
+                        }
+
+                    }
+                };
+                //BarMatrix.Clear();
+
+                /*
+                Thread threadMatrix = new Thread(new ThreadStart(() => {
+
+                    while (true)
+                    {
+                        pct++;
+                        BarMatrix.SetLevel(pct);
+                        if (pct >= 100)
+                        {
+                            pct = 0;
+                            BarMatrix.Clear();
+                        }
+                        Thread.Sleep(100);
+                    }
+                }));
+                threadMatrix.Start();
+                */
+                const int MaxInfo = 9;
+                Random rnd = new Random();
+                int InfoCounter = 0;
+                var solid = new SolidBrush(Color.Blue);
+                while (true)
+                {
+                    var current = sensorCuaca.GetCurrentData();
+                    if (current != null)
+                    {
+                        InfoMatrix.Clear();
+                        CurrentCounter.Person = rnd.Next(1000);
+                        CurrentCounter.Bicycle = rnd.Next(1000);
+                        var jsonToken = JsonSerializer.SerializeObject(current);
+                        var json = jsonToken.ToString();
+                        xbee.SendMessage(json);
+
+                        Debug.WriteLine($"Temp: {current.Temperature}");
+                        Debug.WriteLine($"Wind Dir: {current.WindDirection}");
+                        Debug.WriteLine($"Wind Speed: {current.WindSpeedAverage}");
+                        Debug.WriteLine($"Rain 1d: {current.RainfallOneDay}");
+                        Debug.WriteLine($"Rain 1h: {current.RainfallOneHour}");
+                        Debug.WriteLine($"Barometer: {current.BarPressure}");
+                        Debug.WriteLine($"Humid: {current.Humidity}");
+                        Debug.WriteLine($"Persen: {pct} %");
+                        switch (InfoCounter)
+                        {
+                            case 0:
+                                InfoMatrix.DrawString($"Temp: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 0, 0);
+                                break;
+                            case 1:
+                                InfoMatrix.DrawString($"ARAH ANGIN: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(), 0, 0);
+                                break;
+                            case 2:
+                                InfoMatrix.DrawString($"KEC ANGIN: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                                break;
+                            case 3:
+                                InfoMatrix.DrawString($"HUJAN 1HARI: {current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
+                                break;
+                            case 4:
+                                InfoMatrix.DrawString($"HUJAN 1JAM: {current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
+                                break;
+                            case 5:
+                                InfoMatrix.DrawString($"BAROMETER: {current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
+                                break;
+                            case 6:
+                                InfoMatrix.DrawString($"HUMID: {current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
+                                break;
+                            case 7:
+                                InfoMatrix.DrawString($"ORANG: {CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
+                                break;
+                            case 8:
+                                InfoMatrix.DrawString($"SEPEDA: {CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                                break;
+                        }
+                        InfoMatrix.Flush();
+                        InfoCounter++;
+                        if (InfoCounter >= MaxInfo) InfoCounter = 0;
+                        
+                    }
+
+
+                    Thread.Sleep(2000);
+                }
+            }
         }
-       
+
     }
 
     public class InfoBox
@@ -389,9 +523,10 @@ namespace CamObserver.Device
         int rows;
         Random rnd;
         LedMatrix screen;
+        public string Pesan { set; get; } = "";
         public InfoBox(LedMatrix screen)
         {
-            
+
             this.cols = (int)screen.column;
             this.rows = (int)screen.row;
             this.rnd = new Random();
@@ -427,6 +562,16 @@ namespace CamObserver.Device
                 CharAnimation(words4);
                 LineAnimation2();
                 BallAnimation(200);
+                if (!string.IsNullOrEmpty(Pesan))
+                {
+                    var pesanArr = Pesan.Split(';');
+                    foreach (var msg in pesanArr)
+                    {
+                        var splitWord = msg.Split(' ');
+                        CharAnimation(splitWord);
+                        LineAnimation2();
+                    }
+                }
             }
         }
         void BrickAnimation(int Moves = 16 * 4, int Delay = 100)
@@ -579,15 +724,15 @@ namespace CamObserver.Device
     public class BasicGraphicsImp : BasicGraphics
     {
         ST7735Controller lcd;
-        public BasicGraphicsImp(uint Width, uint Height):base(Width,Height, ColorFormat.Rgb565)
+        public BasicGraphicsImp(uint Width, uint Height) : base(Width, Height, ColorFormat.Rgb565)
         {
-            
+
         }
         public void SetDisplay(ST7735Controller controller)
         {
             lcd = controller;
         }
-      
+
         // You may need to add this to send an optional buffer...
         public void Flush()
         {
@@ -595,26 +740,26 @@ namespace CamObserver.Device
             lcd.DrawBufferNative(this.Buffer);
         }
     }
-    
+
     public class BasicGraphicsDisplay : BasicGraphics
     {
         DisplayController lcd;
-        public BasicGraphicsDisplay(uint Width, uint Height):base(Width,Height, ColorFormat.Rgb565)
+        public BasicGraphicsDisplay(uint Width, uint Height) : base(Width, Height, ColorFormat.Rgb565)
         {
-            
+
         }
         public void SetDisplay(DisplayController controller)
         {
             lcd = controller;
         }
-      
+
         // You may need to add this to send an optional buffer...
         public void Flush()
         {
             // ... for example
-            lcd.DrawBuffer(0,0,0,0,this.Width,this.Height,this.Width,this.Buffer,0);
+            lcd.DrawBuffer(0, 0, 0, 0, this.Width, this.Height, this.Width, this.Buffer, 0);
         }
     }
-    
+
 
 }
