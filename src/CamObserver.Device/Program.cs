@@ -27,7 +27,7 @@ namespace CamObserver.Device
         static int pct = 0;
         static CounterData CurrentCounter;
         public enum Chips { SC20100, SC20260, SC13040 };
-        static Chips MyChip = Chips.SC20100;
+        static Chips MyChip = Chips.SC20260;
         private static void Main()
         {
 
