@@ -103,6 +103,11 @@ namespace CamObserver.Device
                                 {
                                     CurrentCounter.Bicycle = (long)dict[item];
                                 }
+                                else
+                                    if (item == "Message")
+                                {
+                                    infoBox.Pesan = dict[item].ToString();
+                                }
                             }
                     }
                 };
@@ -287,6 +292,11 @@ namespace CamObserver.Device
                                     {
                                         CurrentCounter.Bicycle = (long)dict[item];
                                     }
+                                    else
+                                    if (item == "Message")
+                                    {
+                                        infoBox.Pesan = dict[item].ToString();
+                                    }
                                 }
                         }
                         catch (Exception ex)
@@ -422,7 +432,7 @@ namespace CamObserver.Device
                                     else
                                     if (item == "Message")
                                     {
-                                        infoBox.Pesan = (string)dict[item];
+                                        infoBox.Pesan = dict[item].ToString();
                                     }
                                 }
                         }
@@ -579,7 +589,7 @@ namespace CamObserver.Device
                     {
                         var splitWord = msg.Split(' ');
                         CharAnimation(splitWord);
-                        LineAnimation2();
+                        LineAnimation();
                     }
                 }
             }
