@@ -1,0 +1,30 @@
+﻿@page "/anim/threejs"
+@inject IJSRuntime JSRuntime
+
+<div class="row mt-2">
+    <div class="col-12">
+        <div id="threejscontainer" style="width: 400px; height: 300px;"></div>
+    </div>   
+</div>
+<div class="mt-1">
+<button type="button" class="btn btn-danger" @onclick="Stop">
+    Kalem
+</button>
+<button type="button" class="btn btn-primary" @onclick="Dance">
+    Goyang Donk
+</button>
+</div>
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("ThreeJSFunctions.load");
+    }
+    public async Task Stop()
+    {
+        await JSRuntime.InvokeVoidAsync("ThreeJSFunctions.stop");
+    }
+    public async Task Dance()
+    {
+        await JSRuntime.InvokeVoidAsync("ThreeJSFunctions.start");
+    }
+}

@@ -22,12 +22,13 @@ namespace CamObserver.Device
         private const int SCREEN_HEIGHT = 128;
         const int MATRIX_WIDTH = rows;
         const int MATRIX_HEIGHT = cols * 2;
+        static int DELAY_INFO_SENSOR = 3000;
         const int cols = 32;
         const int rows = 8;
         static int pct = 0;
         static CounterData CurrentCounter;
         public enum Chips { SC20100, SC20260, SC13040 };
-        static Chips MyChip = Chips.SC20260;
+        static Chips MyChip = Chips.SC20100;
         private static void Main()
         {
 
@@ -381,7 +382,7 @@ namespace CamObserver.Device
             }
             else if (MyChip == Chips.SC20100)
             {
-
+                #region init vars
                 var gpio = GpioController.GetDefault();
 
                 var sensorCuaca = new WeatherSensor(SC20100.UartPort.Uart5); //pb12,pb13
@@ -396,6 +397,8 @@ namespace CamObserver.Device
                 var infoBox = new InfoBox(InfoMatrix2);
                 infoBox.StartAnimation();
                 CurrentCounter = new CounterData() { Bicycle = 0, Person = 0 };
+                #endregion
+                #region XBee Terima Data
                 var xbee = new Xbee(SC20100.UartPort.Uart1); //pa 10, pa 9
                 xbee.DataReceived += (s, o) =>
                 {
@@ -430,6 +433,8 @@ namespace CamObserver.Device
 
                     }
                 };
+                #endregion
+                #region Progress bar
                 //BarMatrix.Clear();
 
                 /*
@@ -449,6 +454,8 @@ namespace CamObserver.Device
                 }));
                 threadMatrix.Start();
                 */
+                #endregion
+                #region Looping Info Sensor
                 const int MaxInfo = 9;
                 Random rnd = new Random();
                 int InfoCounter = 0;
@@ -463,8 +470,9 @@ namespace CamObserver.Device
                         CurrentCounter.Bicycle = rnd.Next(1000);
                         var jsonToken = JsonSerializer.SerializeObject(current);
                         var json = jsonToken.ToString();
+                        //send data to mini pc via xbee
                         xbee.SendMessage(json);
-
+                        //for debugging
                         Debug.WriteLine($"Temp: {current.Temperature}");
                         Debug.WriteLine($"Wind Dir: {current.WindDirection}");
                         Debug.WriteLine($"Wind Speed: {current.WindSpeedAverage}");
@@ -476,16 +484,16 @@ namespace CamObserver.Device
                         switch (InfoCounter)
                         {
                             case 0:
-                                InfoMatrix.DrawString($"Temp: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"TEMP: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 0, 0);
                                 break;
                             case 1:
-                                InfoMatrix.DrawString($"ARAH ANGIN: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"ARH ANGIN: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(), 0, 0);
                                 break;
                             case 2:
                                 InfoMatrix.DrawString($"KEC ANGIN: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
                                 break;
                             case 3:
-                                InfoMatrix.DrawString($"HUJAN 1HARI: {current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"HUJAN 1HR: {current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 4:
                                 InfoMatrix.DrawString($"HUJAN 1JAM: {current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
@@ -506,12 +514,14 @@ namespace CamObserver.Device
                         InfoMatrix.Flush();
                         InfoCounter++;
                         if (InfoCounter >= MaxInfo) InfoCounter = 0;
-                        
+
                     }
 
 
-                    Thread.Sleep(2000);
+                    Thread.Sleep(DELAY_INFO_SENSOR);
                 }
+
+                #endregion
             }
         }
 

@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+	  <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="depthai-core.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="depthai-opencv.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="depthai-unity.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Models\face-detection-retail-0004_openvino_2021.2_4shave.blob">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Models\face-detection-retail-0004_openvino_2021.2_4shave.blob.meta">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Models\movenet_singlepose_lightning_3.blob">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Models\movenet_singlepose_lightning_3.blob.meta">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Models\movenet_singlepose_thunder_3.blob">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Models\movenet_singlepose_thunder_3.blob.meta">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Models\yolo-v4-tiny-tf_openvino_2021.4_6shave.blob">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Models\yolo-v4-tiny-tf_openvino_2021.4_6shave.blob.meta">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="opencv_world454.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+</Project>
