@@ -267,6 +267,9 @@ namespace CamObserver.Display
                         newItem.Objek = dr["Jenis"].ToString();
                         newItem.Tanggal = Convert.ToDateTime(dr["Waktu"]);
                         newItem.Aktivitas = "-";
+                        newItem.Tags = "-";
+                        newItem.FileUrl = "-";
+                        newItem.Deskripsi = "-";
                         newItem.Lokasi = AppConstants.Lokasi;
                         newItem.CCTV = AppConstants.CCTVName ;
                         var res = await dataCounterService.InsertData(newItem);
