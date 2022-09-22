@@ -103,11 +103,11 @@ namespace CamObserver.Device
                                 {
                                     CurrentCounter.Bicycle = (long)dict[item];
                                 }
-                                else
-                                    if (item == "Message")
-                                {
-                                    infoBox.Pesan = dict[item].ToString();
-                                }
+                                //else
+                                //    if (item == "Message")
+                                //{
+                                //    infoBox.Pesan = dict[item].ToString();
+                                //}
                             }
                     }
                 };
@@ -168,22 +168,22 @@ namespace CamObserver.Device
                                 InfoMatrix.DrawString($"KEC ANGIN: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
                                 break;
                             case 3:
-                                InfoMatrix.DrawString($"HUJAN 1HARI: {current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"HUJAN 1HARI:{current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 4:
-                                InfoMatrix.DrawString($"HUJAN 1JAM: {current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"HUJAN 1JAM:{current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
                                 break;
                             case 5:
-                                InfoMatrix.DrawString($"BAROMETER: {current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"BAROMETER:{current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
                                 break;
                             case 6:
-                                InfoMatrix.DrawString($"HUMID: {current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"HUMID:{current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
                                 break;
                             case 7:
-                                InfoMatrix.DrawString($"ORANG: {CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"ORANG:{CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 8:
-                                InfoMatrix.DrawString($"SEPEDA: {CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"SEPEDA:{CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
                                 break;
                         }
                         InfoMatrix.Flush();
@@ -506,10 +506,10 @@ namespace CamObserver.Device
                                 InfoMatrix.DrawString($"HUJAN 1HR: {current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 4:
-                                InfoMatrix.DrawString($"HUJAN 1JAM: {current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"HUJAN 1JM: {current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
                                 break;
                             case 5:
-                                InfoMatrix.DrawString($"BAROMETER: {current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
+                                InfoMatrix.DrawString($"TEKANAN: {current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
                                 break;
                             case 6:
                                 InfoMatrix.DrawString($"HUMID: {current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
