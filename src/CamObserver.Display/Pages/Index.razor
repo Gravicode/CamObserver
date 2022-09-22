@@ -1,6 +1,43 @@
 ﻿@page "/"
-<h1>Hello, world!</h1>
+<h1>Cam Observer v0.1</h1>
 
-Welcome to your new app.
+<table class="table table-hover table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">No</th>
+            <th scope="col">Jenis</th>
+            <th scope="col">Jumlah</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (AppConstants.InfoStat != null)
+        {
+            foreach(var item in AppConstants.InfoStat)
+            {
+                 <tr>
+                    <th scope="row">@item.No</th>
+                    <td>@item.Objek</td>
+                    <td>@item.Jumlah.ToString("n0")</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">Tidak ada data</td>
+            </tr>
+        }       
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    </tbody>
+</table>
+
+@code{
+    BlazorTimer timer;
+    protected override void OnInitialized()
+    {
+        timer = new();
+        timer.SetTimer(1000);
+        timer.OnElapsed += async() => { await InvokeAsync(StateHasChanged); };
+    }
+
+}
