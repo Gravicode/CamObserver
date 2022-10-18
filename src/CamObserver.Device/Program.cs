@@ -29,6 +29,25 @@ namespace CamObserver.Device
         static CounterData CurrentCounter;
         public enum Chips { SC20100, SC20260, SC13040 };
         static Chips MyChip = Chips.SC20100;
+
+        static void RunningTextAnimation(LedMatrix screen, string Words, int Delay = 250, int Iterate = 2)
+        {
+            Random rnd = new Random();
+            screen.Clear();
+            var col = LedMatrix.ColorFromRgb(0, 20, 50);
+            var WidthBlock = 3;
+            var TextWidth = Words.Length * WidthBlock;
+            for (var i = 0; i < Iterate; i++)
+                for (var Ax = 0; Ax + TextWidth >= 0; Ax -= WidthBlock)
+                {
+                    col = LedMatrix.ColorFromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
+                    var statement = string.Empty;
+                    screen.Clear();
+                    screen.DrawString(Words, col, Ax, 0);
+                    screen.Flush();
+                    Thread.Sleep(Delay);
+                }
+        }
         private static void Main()
         {
 
@@ -131,7 +150,7 @@ namespace CamObserver.Device
                 threadMatrix.Start();
                 */
                 const int MaxInfo = 9;
-                Random rnd = new Random();
+                //Random rnd = new Random();
                 int InfoCounter = 0;
 
                 while (true)
@@ -141,49 +160,65 @@ namespace CamObserver.Device
                     {
                         //screen.Clear();
                         InfoMatrix.Clear();
-                        CurrentCounter.Person = rnd.Next(1000);
-                        CurrentCounter.Bicycle = rnd.Next(1000);
+                        //CurrentCounter.Person = rnd.Next(1000);
+                        //CurrentCounter.Bicycle = rnd.Next(1000);
                         var jsonToken = JsonSerializer.SerializeObject(current);
                         var json = jsonToken.ToString();
                         xbee.SendMessage(json);
 
-                        screen.DrawString($"Temp: {current.Temperature}", (uint)Color.Blue.ToArgb(), 10, 10);
-                        screen.DrawString($"Wind Dir: {current.WindDirection}", (uint)Color.Blue.ToArgb(), 10, 20);
-                        screen.DrawString($"Wind Speed: {current.WindSpeedAverage}", (uint)Color.Blue.ToArgb(), 10, 30);
-                        screen.DrawString($"Rain 1d: {current.RainfallOneDay}", (uint)Color.Blue.ToArgb(), 10, 40);
-                        screen.DrawString($"Rain 1h: {current.RainfallOneHour}", (uint)Color.Blue.ToArgb(), 10, 50);
-                        screen.DrawString($"Barometer: {current.BarPressure}", (uint)Color.Blue.ToArgb(), 10, 60);
-                        screen.DrawString($"Humid: {current.Humidity}", (uint)Color.Blue.ToArgb(), 10, 70);
-                        screen.DrawString($"Persen: {pct} %", (uint)Color.Blue.ToArgb(), 10, 80);
+                        screen.DrawString($"TEMP: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 10, 10);
+                        screen.DrawString($"WIND DR: {current.WindDirection.ToString("n0")}", (uint)Color.Blue.ToArgb(), 10, 20);
+                        screen.DrawString($"WIND SP: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Blue.ToArgb(), 10, 30);
+                        screen.DrawString($"RAIN 1H: {current.RainfallOneDay.ToString("n0")}", (uint)Color.Blue.ToArgb(), 10, 40);
+                        screen.DrawString($"RAIN 1J: {current.RainfallOneHour.ToString("n0")}", (uint)Color.Blue.ToArgb(), 10, 50);
+                        screen.DrawString($"PRESSUR: {current.BarPressure.ToString("n0")}", (uint)Color.Blue.ToArgb(), 10, 60);
+                        screen.DrawString($"HUMID: {current.Humidity.ToString("n0")}", (uint)Color.Blue.ToArgb(), 10, 70);
+                        screen.DrawString($"PERSEN: {pct.ToString("n0")} %", (uint)Color.Blue.ToArgb(), 10, 80);
 
                         switch (InfoCounter)
                         {
                             case 0:
-                                InfoMatrix.DrawString($"Temp: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"TEMP: {current.Temperature.ToString("n0")}");
+                                //InfoMatrix.DrawString($"TEMP: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 0, 0);
                                 break;
                             case 1:
-                                InfoMatrix.DrawString($"ARAH ANGIN: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"WIND DIRECTION: {current.WindDirection.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"WIND DR: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(), 0, 0);
                                 break;
                             case 2:
-                                InfoMatrix.DrawString($"KEC ANGIN: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"WIND SPEED: {current.WindSpeedAverage.ToString("n0")}");
+                                //InfoMatrix.DrawString($"WIND SP: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
                                 break;
                             case 3:
-                                InfoMatrix.DrawString($"HUJAN 1HARI:{current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"RAIN 1H:{current.RainfallOneDay}");
+
+                                //InfoMatrix.DrawString($"RAIN 1H:{current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 4:
-                                InfoMatrix.DrawString($"HUJAN 1JAM:{current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"RAIN 1J:{current.RainfallOneHour.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"RAIN 1J:{current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
                                 break;
                             case 5:
-                                InfoMatrix.DrawString($"BAROMETER:{current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"PRESSURE:{current.BarPressure.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"PRESSUR:{current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
                                 break;
                             case 6:
-                                InfoMatrix.DrawString($"HUMID:{current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"HUMID:{current.Humidity.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"HUMID:{current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
                                 break;
                             case 7:
-                                InfoMatrix.DrawString($"ORANG:{CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"ORANG:{CurrentCounter.Person.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"ORANG:{CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 8:
-                                InfoMatrix.DrawString($"SEPEDA:{CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"SEPEDA:{CurrentCounter.Bicycle.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"SEPEDA:{CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
                                 break;
                         }
                         InfoMatrix.Flush();
@@ -326,7 +361,7 @@ namespace CamObserver.Device
                 threadMatrix.Start();
                 */
                 const int MaxInfo = 9;
-                Random rnd = new Random();
+                //Random rnd = new Random();
                 int InfoCounter = 0;
                 var solid = new SolidBrush(Color.Blue);
                 while (true)
@@ -336,8 +371,8 @@ namespace CamObserver.Device
                     {
                         screen.Clear();
                         InfoMatrix.Clear();
-                        CurrentCounter.Person = rnd.Next(1000);
-                        CurrentCounter.Bicycle = rnd.Next(1000);
+                        //CurrentCounter.Person = rnd.Next(1000);
+                        //CurrentCounter.Bicycle = rnd.Next(1000);
                         var jsonToken = JsonSerializer.SerializeObject(current);
                         var json = jsonToken.ToString();
                         xbee.SendMessage(json);
@@ -353,32 +388,49 @@ namespace CamObserver.Device
                         switch (InfoCounter)
                         {
                             case 0:
-                                InfoMatrix.DrawString($"Temp: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"TEMP: {current.Temperature.ToString("n0")}");
+                                //InfoMatrix.DrawString($"TEMP: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 0, 0);
                                 break;
                             case 1:
-                                InfoMatrix.DrawString($"ARAH ANGIN: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"WIND DIRECTION: {current.WindDirection.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"WIND DR: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(), 0, 0);
                                 break;
                             case 2:
-                                InfoMatrix.DrawString($"KEC ANGIN: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"WIND SPEED: {current.WindSpeedAverage.ToString("n0")}");
+                                //InfoMatrix.DrawString($"WIND SP: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
                                 break;
                             case 3:
-                                InfoMatrix.DrawString($"HUJAN 1HARI: {current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"RAIN 1H:{current.RainfallOneDay}");
+
+                                //InfoMatrix.DrawString($"RAIN 1H:{current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 4:
-                                InfoMatrix.DrawString($"HUJAN 1JAM: {current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"RAIN 1J:{current.RainfallOneHour.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"RAIN 1J:{current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
                                 break;
                             case 5:
-                                InfoMatrix.DrawString($"BAROMETER: {current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"PRESSURE:{current.BarPressure.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"PRESSUR:{current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
                                 break;
                             case 6:
-                                InfoMatrix.DrawString($"HUMID: {current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"HUMID:{current.Humidity.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"HUMID:{current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
                                 break;
                             case 7:
-                                InfoMatrix.DrawString($"ORANG: {CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"ORANG:{CurrentCounter.Person.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"ORANG:{CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 8:
-                                InfoMatrix.DrawString($"SEPEDA: {CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"SEPEDA:{CurrentCounter.Bicycle.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"SEPEDA:{CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
                                 break;
+
                         }
                         InfoMatrix.Flush();
                         InfoCounter++;
@@ -494,32 +546,49 @@ namespace CamObserver.Device
                         switch (InfoCounter)
                         {
                             case 0:
-                                InfoMatrix.DrawString($"TEMP: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"TEMP: {current.Temperature.ToString("n0")}");
+                                //InfoMatrix.DrawString($"TEMP: {current.Temperature.ToString("n0")}", (uint)Color.Blue.ToArgb(), 0, 0);
                                 break;
                             case 1:
-                                InfoMatrix.DrawString($"ARH ANGIN: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"WIND DIRECTION: {current.WindDirection.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"WIND DR: {current.WindDirection.ToString("n0")}", (uint)Color.Red.ToArgb(), 0, 0);
                                 break;
                             case 2:
-                                InfoMatrix.DrawString($"KEC ANGIN: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"WIND SPEED: {current.WindSpeedAverage.ToString("n0")}");
+                                //InfoMatrix.DrawString($"WIND SP: {current.WindSpeedAverage.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
                                 break;
                             case 3:
-                                InfoMatrix.DrawString($"HUJAN 1HR: {current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"RAIN 1H:{current.RainfallOneDay}");
+
+                                //InfoMatrix.DrawString($"RAIN 1H:{current.RainfallOneDay}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 4:
-                                InfoMatrix.DrawString($"HUJAN 1JM: {current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"RAIN 1J:{current.RainfallOneHour.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"RAIN 1J:{current.RainfallOneHour.ToString("n0")}", (uint)Color.White.ToArgb(), 0, 0);
                                 break;
                             case 5:
-                                InfoMatrix.DrawString($"TEKANAN: {current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"PRESSURE:{current.BarPressure.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"PRESSUR:{current.BarPressure.ToString("n0")}", (uint)Color.Purple.ToArgb(), 0, 0);
                                 break;
                             case 6:
-                                InfoMatrix.DrawString($"HUMID: {current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"HUMID:{current.Humidity.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"HUMID:{current.Humidity.ToString("n0")}", (uint)Color.Teal.ToArgb(), 0, 0);
                                 break;
                             case 7:
-                                InfoMatrix.DrawString($"ORANG: {CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"ORANG:{CurrentCounter.Person.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"ORANG:{CurrentCounter.Person.ToString("n0")}", (uint)Color.Green.ToArgb(), 0, 0);
                                 break;
                             case 8:
-                                InfoMatrix.DrawString($"SEPEDA: {CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
+                                RunningTextAnimation(InfoMatrix, $"SEPEDA:{CurrentCounter.Bicycle.ToString("n0")}");
+
+                                //InfoMatrix.DrawString($"SEPEDA:{CurrentCounter.Bicycle.ToString("n0")}", (uint)Color.Yellow.ToArgb(), 0, 0);
                                 break;
+
                         }
                         InfoMatrix.Flush();
                         InfoCounter++;
@@ -536,6 +605,8 @@ namespace CamObserver.Device
         }
 
     }
+
+
 
     public class InfoBox
     {
@@ -565,10 +636,12 @@ namespace CamObserver.Device
         }
         void Animation()
         {
-            string[] words = { "WILUJENG", "SUMPING" };
-            string[] words2 = { "BOGOR", "TEGAR", "BERIMAN" };
+            string[] words = { "EKOSISTEM", "BERLARI", "KOTA", "BOGOR"};
+            string[] words2 = { "BOGOR", "CITY","OF", "RUNNERS" };
             string[] words3 = { "SELAMAT", "BEROLAHRAGA", "SEMANGAT !!", };
-            string[] words4 = { "HIDUP", "SEHAT", "SELALU" };
+            string[] words4 = { "DARI", "MEDIAMOVE", "UNTUK","BOGOR" };
+            string[] words5 = { "WWW.", "BOGOR", "CITY","OF", "RUNNERS", ".ID" };
+            
             while (true)
             {
                 CountDownAnimation(0, 100, 1);
@@ -580,6 +653,8 @@ namespace CamObserver.Device
                 CharAnimation(words3);
                 LineAnimation();
                 CharAnimation(words4);
+                BrickAnimation();
+                CharAnimation(words5);
                 LineAnimation2();
                 BallAnimation(200);
                 if (!string.IsNullOrEmpty(Pesan))
@@ -695,6 +770,24 @@ namespace CamObserver.Device
                         Thread.Sleep(Delay);
                     }
                 }
+            }
+        }
+
+        void RunningTextAnimation(string Words, int Delay = 500, int Iterate=2)
+        {
+            screen.Clear();
+            var col = LedMatrix.ColorFromRgb(0, 20, 50);
+            var WidthBlock = 3;
+            var TextWidth = Words.Length * WidthBlock;
+            for(var i=0;i<Iterate;i++)
+            for (var Ax = 0; Ax + TextWidth >= 0; Ax -= WidthBlock)
+            {
+                col = LedMatrix.ColorFromRgb((byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255));
+                var statement = string.Empty;
+                screen.Clear();
+                screen.DrawString(Words, col, Ax, 0);
+                screen.Flush();
+                Thread.Sleep(Delay);
             }
         }
         void CharAnimation(string[] Words, int Delay = 500)
