@@ -17,6 +17,8 @@ namespace CamObserver.Display.Helpers
         public static string Cctv1 { set; get; }
         public static string CCTVName { set; get; } = "CCTV-001";
 
+        public static int SyncDelay = 1000;
+        public static bool AutoStart = false;
         public static List<ObjekStatistik> InfoStat { set; get; } = new();
     }
 

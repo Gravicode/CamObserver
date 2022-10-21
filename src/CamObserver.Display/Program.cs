@@ -53,7 +53,8 @@ namespace CamObserver.Display
                 AppConstants.Gateway = Configuration["App:Gateway"];
                 AppConstants.Lokasi = Configuration["App:Lokasi"];
                 AppConstants.CCTVName = Configuration["App:CCTVName"];
-
+                AppConstants.SyncDelay = int.Parse(Configuration["App:SyncDelay"]);
+                AppConstants.AutoStart = bool.Parse(Configuration["App:AutoStart"]);
                 //AppConstants.Label = Configuration["NetworkModel:Label"];
                 //AppConstants.Weights = Configuration["NetworkModel:Weights"];
                 //AppConstants.Cfg = Configuration["NetworkModel:Cfg"];

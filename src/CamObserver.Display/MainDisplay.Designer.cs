@@ -37,6 +37,7 @@
             this.BtnStop = new MetroFramework.Controls.MetroTile();
             this.BtnStart = new MetroFramework.Controls.MetroTile();
             this.TxtStatus = new MetroFramework.Controls.MetroLabel();
+            this.BtnConfig = new MetroFramework.Controls.MetroTile();
             ((System.ComponentModel.ISupportInitialize)(this.PicBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -50,10 +51,10 @@
             // 
             // TxtInfo
             // 
-            this.TxtInfo.Location = new System.Drawing.Point(12, 294);
+            this.TxtInfo.Location = new System.Drawing.Point(12, 350);
             this.TxtInfo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.TxtInfo.Name = "TxtInfo";
-            this.TxtInfo.Size = new System.Drawing.Size(256, 137);
+            this.TxtInfo.Size = new System.Drawing.Size(256, 72);
             this.TxtInfo.TabIndex = 8;
             this.TxtInfo.Text = "";
             // 
@@ -76,7 +77,7 @@
             this.BtnSync.Name = "BtnSync";
             this.BtnSync.Size = new System.Drawing.Size(256, 50);
             this.BtnSync.TabIndex = 22;
-            this.BtnSync.Text = "Sync to Cloud";
+            this.BtnSync.Text = "Sync to Clou&d";
             this.BtnSync.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.BtnSync.TileTextFontSize = MetroFramework.MetroTileTextSize.Tall;
             this.BtnSync.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
@@ -90,7 +91,7 @@
             this.BtnSave.Name = "BtnSave";
             this.BtnSave.Size = new System.Drawing.Size(256, 50);
             this.BtnSave.TabIndex = 20;
-            this.BtnSave.Text = "Save Log";
+            this.BtnSave.Text = "Save &Log";
             this.BtnSave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.BtnSave.TileTextFontSize = MetroFramework.MetroTileTextSize.Tall;
             this.BtnSave.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
@@ -104,7 +105,7 @@
             this.BtnOpen.Name = "BtnOpen";
             this.BtnOpen.Size = new System.Drawing.Size(256, 50);
             this.BtnOpen.TabIndex = 21;
-            this.BtnOpen.Text = "Open File (Dev only)";
+            this.BtnOpen.Text = "&Open File (Dev only)";
             this.BtnOpen.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.BtnOpen.TileTextFontSize = MetroFramework.MetroTileTextSize.Tall;
             this.BtnOpen.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
@@ -153,11 +154,26 @@
             this.TxtStatus.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             this.TxtStatus.UseStyleColors = true;
             // 
+            // BtnConfig
+            // 
+            this.BtnConfig.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnConfig.Location = new System.Drawing.Point(12, 295);
+            this.BtnConfig.Name = "BtnConfig";
+            this.BtnConfig.Size = new System.Drawing.Size(256, 50);
+            this.BtnConfig.TabIndex = 26;
+            this.BtnConfig.Text = "Save &Config";
+            this.BtnConfig.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.BtnConfig.TileTextFontSize = MetroFramework.MetroTileTextSize.Tall;
+            this.BtnConfig.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
+            this.BtnConfig.UseVisualStyleBackColor = true;
+            // 
             // MainDisplay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1230, 494);
+            this.ClientSize = new System.Drawing.Size(1230, 471);
+            this.Controls.Add(this.BtnConfig);
             this.Controls.Add(this.TxtStatus);
             this.Controls.Add(this.BtnStop);
             this.Controls.Add(this.BtnStart);
@@ -168,6 +184,7 @@
             this.Controls.Add(this.PicBox1);
             this.Controls.Add(this.blazorWebView1);
             this.Name = "MainDisplay";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Cam Observer v0.1";
             ((System.ComponentModel.ISupportInitialize)(this.PicBox1)).EndInit();
             this.ResumeLayout(false);
@@ -185,5 +202,6 @@
         private MetroFramework.Controls.MetroTile BtnStop;
         private MetroFramework.Controls.MetroTile BtnStart;
         private MetroFramework.Controls.MetroLabel TxtStatus;
+        private MetroFramework.Controls.MetroTile BtnConfig;
     }
 }

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,6 +23,7 @@ namespace CamObserver.Display
 {
     public partial class MainDisplay : Form
     {
+        private System.Timers.Timer PushTimer;
         int ImgHeight = 416, ImgWidth = 416;
         Point StartLocation;
         bool IsSelect = false;
@@ -30,9 +32,9 @@ namespace CamObserver.Display
         bool IsCapturing = false;
         string SelectedFile;
         CancellationTokenSource source;
-
+        AppConfig appConfig;
         Tracker tracker;
-
+        List<OakDeviceItem> ListDevice;
         int DelayTime = 1;
         public MainDisplay()
         {
@@ -44,6 +46,7 @@ namespace CamObserver.Display
             blazorWebView1.Services = services.BuildServiceProvider();
             blazorWebView1.RootComponents.Add<Main>("#app");
             Setup();
+            if (AppConstants.AutoStart) Start();
         }
 
 
@@ -70,7 +73,7 @@ namespace CamObserver.Display
                 var dt = tracker.GetLogTable();
                 foreach (var fil in filter)
                 {
-                    var count = dt.AsEnumerable().Where(x => x.Field<string>("Jenis") == "person").Count();
+                    var count = dt.AsEnumerable().Where(x => x.Field<string>("Jenis") == fil).Count();
                     AppConstants.InfoStat.Add(new ObjekStatistik() { Jumlah = count, No = row++, Objek = fil });
                 }
                 if (token.IsCancellationRequested) break;
@@ -88,7 +91,7 @@ namespace CamObserver.Display
         {
 
             var manager = new OAKDeviceManager();
-            var list = manager.GetAvailableDevices();
+            ListDevice = manager.GetAvailableDevices();
             source = new();
             dataCounterService = ObjectContainer.Get<DataCounterService>();
 
@@ -171,72 +174,7 @@ namespace CamObserver.Display
             //stream = new();
             BtnStart.Click += (a, b) =>
             {
-                BtnStart.Enabled = false;
-                BtnStop.Enabled = true;
-                Clear();
-                var device = list.First();
-                objdet = new();
-
-                objdet.ObjectDetected += (_, o) =>
-                {
-                    if (InvokeRequired)
-                    {
-                        this.BeginInvoke((MethodInvoker)async delegate ()
-                        {
-                            //PicBox1.Image = o.NewImage;
-                            TxtInfo.Clear();
-                            foreach (var obj in o.DetectedObjects)
-                            {
-                                TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
-                            }
-                            DoTracking(o.DetectedObjects, o.NewImage, source.Token);
-                        });
-                    }
-                    else
-                    {
-                        PicBox1.Image = o.NewImage;
-                        TxtInfo.Clear();
-                        foreach (var obj in o.DetectedObjects)
-                        {
-                            TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
-                        }
-                    }
-                };
-
-                objdet.device = new();
-                objdet.device.deviceId = device.deviceId;
-                objdet.ConnectDevice();
-
-                objdet.StartAnalysis();
-                var task = Task.Run(() => UpdateStatLoop(source.Token));
-                /*
-                face = new DaiFaceDetector();
-
-                face.FaceDetected += (_, o) => {
-                    if (InvokeRequired)
-                    {
-                        this.BeginInvoke((MethodInvoker)delegate ()
-                        {
-                            PicBox1.Image = o.NewImage;
-                            TxtInfo.Clear();
-                            TxtInfo.Text = $"center X: {o.valueCenterX}\ncenter Y: {o.valueCenterY}";
-                        });
-                    }
-                    else
-                    {
-                        PicBox1.Image = o.NewImage;
-                        TxtInfo.Clear();
-                        TxtInfo.Text = $"center X: {o.valueCenterX}\ncenter Y: {o.valueCenterY}";
-                    }
-                };
-
-                face.device = new();
-                face.device.deviceId = device.deviceId;
-                face.ConnectDevice();
-
-                face.StartAnalysis();
-               */
-
+                Start();
             };
             BtnStop.Click += (a, b) =>
             {
@@ -253,13 +191,112 @@ namespace CamObserver.Display
 
 
             };
+            appConfig = new();
+            BtnConfig.Click += (a, b) => {
+                if (SelectionArea != null)
+                {
+                    var cord = $"{SelectionArea.X},{SelectionArea.Y},{SelectionArea.Width},{SelectionArea.Height}";
+                    appConfig.MyConfig["Coords"]["SelectionArea"] = cord;
+                    appConfig.Save();
+                    TxtStatus.Text = "Save config ok";
+                }
+            };
+            var selStr = appConfig.MyConfig["Coords"]["SelectionArea"].ToString();
+            if(selStr!=null && !string.IsNullOrEmpty(selStr))
+            {
+                var cord = selStr.Split(",");
+                SelectionArea = new Rectangle(int.Parse(cord[0]), int.Parse(cord[1]), int.Parse(cord[2]), int.Parse(cord[3]));
+                PicBox1.Invalidate();
+            }
+            PushTimer = new();// System.Windows.Forms.Timer();
+            PushTimer.Interval = AppConstants.SyncDelay;
+            TxtInfo.Text += $"Sync Time: {AppConstants.SyncDelay/1000} seconds";
+            PushTimer.Elapsed += async (a, b) => {
+                try
+                {
+                    PushTimer.Stop();
+                    if (!CheckInternetConnection())
+                    {
+                        if (InvokeRequired)
+                        {
+                            this.BeginInvoke((MethodInvoker)async delegate ()
+                            {
+                                TxtStatus.Text = ("Internet connection not available, cancel sync data...");
+                            });
+                        }
+                        else
+                        {
+                            TxtStatus.Text = ("Internet connection not available, cancel sync data...");
+                        }
+                       
+                    }
+                    else {
+                        await SyncToCloud();
+                    }
+                }
+                finally
+                {
+                    PushTimer.Start();
+                }
+            };
+            PushTimer.Start();
+            TxtInfo.AppendText("\nAuto sync is enabled.");
+        }
+      
+        void Start()
+        {
+            BtnStart.Enabled = false;
+            BtnStop.Enabled = true;
+            Clear();
+            var device = ListDevice.First();
+            objdet = new();
+
+            objdet.ObjectDetected += (_, o) =>
+            {
+                if (InvokeRequired)
+                {
+                    this.BeginInvoke((MethodInvoker)async delegate ()
+                    {
+                        //PicBox1.Image = o.NewImage;
+                        TxtInfo.Clear();
+                        foreach (var obj in o.DetectedObjects)
+                        {
+                            TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
+                        }
+                        DoTracking(o.DetectedObjects, o.NewImage, source.Token);
+                    });
+                }
+                else
+                {
+                    PicBox1.Image = o.NewImage;
+                    TxtInfo.Clear();
+                    foreach (var obj in o.DetectedObjects)
+                    {
+                        TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
+                    }
+                }
+            };
+
+            objdet.device = new();
+            objdet.device.deviceId = device.deviceId;
+            objdet.ConnectDevice();
+
+            objdet.StartAnalysis();
+            var task = Task.Run(() => UpdateStatLoop(source.Token));
+
+        }
+        bool CheckInternetConnection()
+        {
+            return (new Ping().Send("www.google.com.mx").Status == IPStatus.Success);
+
         }
         async Task SyncToCloud()
         {
+            var resultStr = string.Empty;
             try
             {
                 var table = tracker.GetLogTable();
-                if (table != null)
+                if (table != null && table.Rows.Count>0)
                 {
                     foreach (DataRow dr in table.Rows)
                     {
@@ -274,15 +311,30 @@ namespace CamObserver.Display
                         newItem.CCTV = AppConstants.CCTVName ;
                         var res = await dataCounterService.InsertData(newItem);
                     }
+                    tracker.ClearLogTable();
+                    resultStr = $"Sync succeed at {DateTime.Now}";
                 }
-                Console.WriteLine("Sync succeed");
+                else
+                {
+                    resultStr = $"No data to sync at {DateTime.Now}";
+                }
             }
             catch (Exception ex)
             {
 
-                Console.WriteLine($"Sync failed:{ex.ToString()}");
+                resultStr =  $"Sync failed at {DateTime.Now}:{ex.ToString()}";
             }
-
+            if (InvokeRequired)
+            {
+                this.BeginInvoke((MethodInvoker)async delegate ()
+                {
+                    TxtStatus.Text = resultStr;
+                });
+            }
+            else
+            {
+                TxtStatus.Text = resultStr;
+            }
         }
 
         public string? OpenFileDialogForm()
@@ -361,12 +413,12 @@ namespace CamObserver.Display
             //});
 
             watch.Stop();
-
+            /*
             this.TxtStatus?.Invoke((MethodInvoker)delegate
             {
                 TxtStatus.Text = $"FPS: {(1000f / watch.ElapsedMilliseconds).ToString("n0")}";
             });
-
+            */
 
             if (token.IsCancellationRequested)
             {

@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="MainDisplay.cs~RF20f28a10.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IniFile.NET" Version="1.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.WindowsForms" Version="6.0.540" />
 		  <PackageReference Include="MetroFramework" Version="1.2.0.3" />
 		  <PackageReference Include="MetroFramework.Design" Version="1.2.0.3" />
@@ -38,5 +43,18 @@
 		<Reference Include="GemBox.Spreadsheet">
 			<HintPath>..\Dependencies\GemBox.Spreadsheet.dll</HintPath>
 		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Properties\Settings.Designer.cs">
+	    <DesignTimeSharedInput>True</DesignTimeSharedInput>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Settings.settings</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Properties\Settings.settings">
+	    <Generator>SettingsSingleFileGenerator</Generator>
+	    <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+	  </None>
 	</ItemGroup>
 </Project>

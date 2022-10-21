@@ -50,7 +50,10 @@ namespace CamObserver.Display.Helpers
             table.Columns.Add("Jenis");
             table.AcceptChanges();
         }
-
+        public void ClearLogTable()
+        {
+            table.Rows.Clear();
+        }
         public DataTable GetLogTable()
         {
             return table;
