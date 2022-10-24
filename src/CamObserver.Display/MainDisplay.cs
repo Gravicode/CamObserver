@@ -78,7 +78,7 @@ namespace CamObserver.Display
 
             var manager = new OAKDeviceManager();
             ListDevice = manager.GetAvailableDevices();
-            source = new();
+           
             dataCounterService = ObjectContainer.Get<DataCounterService>();
 
             tracker = new Tracker();
@@ -173,8 +173,7 @@ namespace CamObserver.Display
                 source.Cancel();
                 objdet.FinishDevice();
                 objdet.Dispose();
-
-
+                IsCapturing = false;
 
             };
             appConfig = new();
@@ -231,6 +230,7 @@ namespace CamObserver.Display
       
         void Start()
         {
+            source = new();
             BtnStart.Enabled = false;
             BtnStop.Enabled = true;
             Clear();
@@ -408,6 +408,7 @@ namespace CamObserver.Display
 
             if (token.IsCancellationRequested)
             {
+                IsCapturing = false;
                 return;
             }
 
