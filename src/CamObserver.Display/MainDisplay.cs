@@ -239,8 +239,8 @@ namespace CamObserver.Display
 
             objdet.ObjectDetected += (_, o) =>
             {
-                var tempImg = (Image)o.NewImage?.Clone();
-                if (tempImg != null)
+                //var tempImg = (Image)o.NewImage?.Clone();
+                if (o.NewImage != null)
                 {
                     if (InvokeRequired)
                     {
@@ -252,7 +252,7 @@ namespace CamObserver.Display
                             {
                                 TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
                             }
-                            DoTracking(o.DetectedObjects, tempImg, source.Token);
+                            DoTracking(o.DetectedObjects, o.NewImage, source.Token);
                         });
                     }
                     else
@@ -263,9 +263,9 @@ namespace CamObserver.Display
                         {
                             TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
                         }
-                        DoTracking(o.DetectedObjects, tempImg, source.Token);
+                        DoTracking(o.DetectedObjects, o.NewImage, source.Token);
                     }
-                    tempImg.Dispose();
+                    //tempImg.Dispose();
                 }
             };
 
