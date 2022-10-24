@@ -138,7 +138,7 @@
             this.BtnStart.TileTextFontSize = MetroFramework.MetroTileTextSize.Tall;
             this.BtnStart.TileTextFontWeight = MetroFramework.MetroTileTextWeight.Bold;
             this.BtnStart.UseVisualStyleBackColor = true;
-            this.BtnStart.Click += new System.EventHandler(this.BtnStart_Click);
+           
             // 
             // TxtStatus
             // 

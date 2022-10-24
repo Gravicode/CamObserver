@@ -1,22 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
 using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using CamObserver.Display.Data;
 using CamObserver.Display.Helpers;
-using CamObserver.Display.Pages;
 using CamObserver.Models;
 using CamObserver.Tools;
 using DepthAI.Core;
-using GemBox.Document;
 using Microsoft.AspNetCore.Components.WebView.WindowsForms;
 using Microsoft.Extensions.DependencyInjection;
 namespace CamObserver.Display
@@ -59,10 +48,7 @@ namespace CamObserver.Display
 
         record analysistype(string name, string value);
 
-        private void BtnStart_Click(object sender, EventArgs e)
-        {
-
-        }
+       
 
         void UpdateStatLoop(CancellationToken token)
         {
@@ -253,9 +239,23 @@ namespace CamObserver.Display
 
             objdet.ObjectDetected += (_, o) =>
             {
-                if (InvokeRequired)
+                var tempImg = (Image)o.NewImage?.Clone();
+                if (tempImg != null)
                 {
-                    this.BeginInvoke((MethodInvoker)async delegate ()
+                    if (InvokeRequired)
+                    {
+                        this.BeginInvoke((MethodInvoker)async delegate ()
+                        {
+                            //PicBox1.Image = o.NewImage;
+                            TxtInfo.Clear();
+                            foreach (var obj in o.DetectedObjects)
+                            {
+                                TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
+                            }
+                            DoTracking(o.DetectedObjects, tempImg, source.Token);
+                        });
+                    }
+                    else
                     {
                         //PicBox1.Image = o.NewImage;
                         TxtInfo.Clear();
@@ -263,17 +263,9 @@ namespace CamObserver.Display
                         {
                             TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
                         }
-                        DoTracking(o.DetectedObjects, o.NewImage, source.Token);
-                    });
-                }
-                else
-                {
-                    PicBox1.Image = o.NewImage;
-                    TxtInfo.Clear();
-                    foreach (var obj in o.DetectedObjects)
-                    {
-                        TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
+                        DoTracking(o.DetectedObjects, tempImg, source.Token);
                     }
+                    tempImg.Dispose();
                 }
             };
 
@@ -405,12 +397,6 @@ namespace CamObserver.Display
                 // Running on the UI thread
                 PicBox1.Image = bmp;
             });
-
-            //this.PicBox1?.Invoke((MethodInvoker)delegate
-            //{
-            //    // Running on the UI thread
-            //    PicBox1.Image = resize.ToBitmap();
-            //});
 
             watch.Stop();
             /*
