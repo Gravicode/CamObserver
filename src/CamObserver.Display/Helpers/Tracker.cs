@@ -38,8 +38,8 @@ namespace CamObserver.Display.Helpers
     }
     public class Tracker
     {
-        const int DistanceLimit = 100;
-        const int TimeLimit = 5; //in seconds
+        public static int DistanceLimit = 100; //in pixel
+        public static int TimeLimit = 5; //in seconds
         public List<TrackedObject> TrackedList;
         DataTable table = new DataTable("counter");
         public Tracker()
@@ -76,8 +76,9 @@ namespace CamObserver.Display.Helpers
                 //P2.X;//BoundingBox[2];
                 //P2.Y;//BoundingBox[3];
                 IsAdded = true;
+                //get center point of an object
                 var pos = new PointF(newItem.P1.X + Math.Abs((newItem.P1.X - newItem.P2.X) /2), newItem.P1.Y + Math.Abs((newItem.P2.Y - newItem.P1.Y) / 2));
-               
+                //search the closest tracked objects with the new point
                 var selTarget = TrackedList.Where(x=> Distance(pos, x.Location)<DistanceLimit && !Existing.Contains(x.Id) && newItem.Label == x.Label).FirstOrDefault();
                 if (selTarget != null)
                 {
@@ -88,19 +89,21 @@ namespace CamObserver.Display.Helpers
 
                 }else
                 {
+                    //treat as new tracked object
                     var newObj = new TrackedObject() { Location = pos, Label = newItem.Label };
                     TrackedList.Add(newObj);
                     Existing.Add(newObj.Id);
                 }
                 
             }
+            //remove unmoved/static object, object that doesn't move more than time limit
             var now = DateTime.Now;
             var removes = TrackedList.Where(x=>TimeGapInSecond(now,x.LastUpdate)>TimeLimit).ToList();
             foreach(var item in removes)
             {
                 TrackedList.Remove(item);
             }
-            //count
+            //count, if object is inside the select area, give it flag
             foreach(var item in TrackedList)
             {
                 if(SelectArea.Contains(new Point((int) item.Location.X, (int)item.Location.Y)) && !item.HasBeenCounted)
