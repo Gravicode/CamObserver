@@ -54,9 +54,10 @@ namespace CamObserver.Display
         {
             while (true)
             {
-                AppConstants.InfoStat.Clear();
                 var row = 0;
                 var dt = tracker.GetLogTable();
+                AppConstants.InfoStat.Clear();
+
                 foreach (var fil in filter)
                 {
                     var count = dt.AsEnumerable().Where(x => x.Field<string>("Jenis") == fil).Count();

@@ -12,7 +12,8 @@
     <tbody>
         @if (AppConstants.InfoStat != null)
         {
-            foreach(var item in AppConstants.InfoStat)
+            var datatmp = AppConstants.InfoStat.ToArray();
+            foreach(var item in datatmp)
             {
                  <tr>
                     <th scope="row">@item.No</th>
