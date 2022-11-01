@@ -48,7 +48,7 @@ namespace CamObserver.Display
 
         record analysistype(string name, string value);
 
-       
+
 
         void UpdateStatLoop(CancellationToken token)
         {
@@ -79,7 +79,7 @@ namespace CamObserver.Display
 
             var manager = new OAKDeviceManager();
             ListDevice = manager.GetAvailableDevices();
-           
+
             dataCounterService = ObjectContainer.Get<DataCounterService>();
 
             tracker = new Tracker();
@@ -106,7 +106,7 @@ namespace CamObserver.Display
                     this.Text = $"Cam Observer v1.0 ({SelectedFile})";
                 }
             };
-            
+
             PicBox1.Resize += (object? sender, EventArgs e) =>
             {
                 ImgHeight = PicBox1.Height;
@@ -114,7 +114,7 @@ namespace CamObserver.Display
 
             };
             PicBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-          
+
             PicBox1.Paint += (object? sender, PaintEventArgs e) =>
             {
                 if (SelectionArea.Width > 0)
@@ -178,7 +178,8 @@ namespace CamObserver.Display
 
             };
             appConfig = new();
-            BtnConfig.Click += (a, b) => {
+            BtnConfig.Click += (a, b) =>
+            {
                 if (SelectionArea != null)
                 {
                     var cord = $"{SelectionArea.X},{SelectionArea.Y},{SelectionArea.Width},{SelectionArea.Height}";
@@ -188,7 +189,7 @@ namespace CamObserver.Display
                 }
             };
             var selStr = appConfig.MyConfig["Coords"]["SelectionArea"].ToString();
-            if(selStr!=null && !string.IsNullOrEmpty(selStr))
+            if (selStr != null && !string.IsNullOrEmpty(selStr))
             {
                 var cord = selStr.Split(",");
                 SelectionArea = new Rectangle(int.Parse(cord[0]), int.Parse(cord[1]), int.Parse(cord[2]), int.Parse(cord[3]));
@@ -196,8 +197,9 @@ namespace CamObserver.Display
             }
             PushTimer = new();// System.Windows.Forms.Timer();
             PushTimer.Interval = AppConstants.SyncDelay;
-            TxtInfo.Text += $"Sync Time: {AppConstants.SyncDelay/1000} seconds";
-            PushTimer.Elapsed += async (a, b) => {
+            TxtInfo.Text += $"Sync Time: {AppConstants.SyncDelay / 1000} seconds";
+            PushTimer.Elapsed += async (a, b) =>
+            {
                 try
                 {
                     PushTimer.Stop();
@@ -214,9 +216,10 @@ namespace CamObserver.Display
                         {
                             TxtStatus.Text = ("Internet connection not available, cancel sync data...");
                         }
-                       
+
                     }
-                    else {
+                    else
+                    {
                         await SyncToCloud();
                     }
                 }
@@ -228,7 +231,8 @@ namespace CamObserver.Display
             PushTimer.Start();
             TxtInfo.AppendText("\nAuto sync is enabled.");
         }
-      
+        ObjectDetectedArgs TempArgs;
+        Bitmap CaptureImage;
         void Start()
         {
             source = new();
@@ -240,34 +244,8 @@ namespace CamObserver.Display
 
             objdet.ObjectDetected += (_, o) =>
             {
-                //var tempImg = (Image)o.NewImage?.Clone();
-                if (o.NewImage != null)
-                {
-                    if (InvokeRequired)
-                    {
-                        this.BeginInvoke((MethodInvoker)async delegate ()
-                        {
-                            //PicBox1.Image = o.NewImage;
-                            TxtInfo.Clear();
-                            foreach (var obj in o.DetectedObjects)
-                            {
-                                TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
-                            }
-                            DoTracking(o.DetectedObjects, o.NewImage, source.Token);
-                        });
-                    }
-                    else
-                    {
-                        //PicBox1.Image = o.NewImage;
-                        TxtInfo.Clear();
-                        foreach (var obj in o.DetectedObjects)
-                        {
-                            TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
-                        }
-                        DoTracking(o.DetectedObjects, o.NewImage, source.Token);
-                    }
-                    //tempImg.Dispose();
-                }
+                TempArgs = o;
+                ProcessWorker.RunWorkerAsync();
             };
 
             objdet.device = new();
@@ -289,7 +267,7 @@ namespace CamObserver.Display
             try
             {
                 var table = tracker.GetLogTable();
-                if (table != null && table.Rows.Count>0)
+                if (table != null && table.Rows.Count > 0)
                 {
                     foreach (DataRow dr in table.Rows)
                     {
@@ -301,7 +279,7 @@ namespace CamObserver.Display
                         newItem.FileUrl = "-";
                         newItem.Deskripsi = "-";
                         newItem.Lokasi = AppConstants.Lokasi;
-                        newItem.CCTV = AppConstants.CCTVName ;
+                        newItem.CCTV = AppConstants.CCTVName;
                         var res = await dataCounterService.InsertData(newItem);
                     }
                     tracker.ClearLogTable();
@@ -315,7 +293,7 @@ namespace CamObserver.Display
             catch (Exception ex)
             {
 
-                resultStr =  $"Sync failed at {DateTime.Now}:{ex.ToString()}";
+                resultStr = $"Sync failed at {DateTime.Now}:{ex.ToString()}";
             }
             if (InvokeRequired)
             {
@@ -363,6 +341,50 @@ namespace CamObserver.Display
                 source.Cancel();
         }
 
+        private void ProcessWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            if (TempArgs == null) return;
+            var o = TempArgs;
+            //var tempImg = (Image)o.NewImage?.Clone();
+            if (o.NewImage != null)
+            {
+                if (InvokeRequired)
+                {
+                    this.BeginInvoke((MethodInvoker)async delegate ()
+                    {
+                        //PicBox1.Image = o.NewImage;
+                        TxtInfo.Clear();
+                        foreach (var obj in o.DetectedObjects)
+                        {
+                            TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
+                        }
+                        DoTracking(o.DetectedObjects, o.NewImage, source.Token);
+                    });
+                }
+                else
+                {
+                    //PicBox1.Image = o.NewImage;
+                    TxtInfo.Clear();
+                    foreach (var obj in o.DetectedObjects)
+                    {
+                        TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
+                    }
+                    DoTracking(o.DetectedObjects, o.NewImage, source.Token);
+                }
+                //tempImg.Dispose();
+            }
+        }
+
+        private void ProcessWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            this.Invoke((MethodInvoker)delegate
+            {
+
+                PicBox1.Image = CaptureImage;
+            });
+
+        }
+
         private static readonly string[] filter = new string[] {
             "bicycle", "person"
         };
@@ -392,13 +414,14 @@ namespace CamObserver.Display
             // draw tracker
             tracker.Process(filtered, selectRect);
             var bmp = DrawResults.Draw(filtered, (Bitmap)nextFrame, tracker);
-
+            CaptureImage = bmp;
+            /*
             this.PicBox1?.Invoke((MethodInvoker)delegate
             {
                 // Running on the UI thread
                 PicBox1.Image = bmp;
             });
-
+            */
             watch.Stop();
             /*
             this.TxtStatus?.Invoke((MethodInvoker)delegate

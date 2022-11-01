@@ -169,7 +169,7 @@ namespace DepthAI.Core
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex);
-                    objectDetectorResults = device.results;
+                    //objectDetectorResults = device.results;
 
                 }
             }
