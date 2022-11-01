@@ -394,7 +394,8 @@ namespace CamObserver.Display
             Rectangle selectRect = new Rectangle();
             if (IsCapturing) return;
             IsCapturing = true;
-
+            var frameHeight = nextFrame.Height;
+            var frameWidth = nextFrame.Width;   
             if (SelectionArea.Width > 0 && SelectionArea.Height > 0)
             {
                 // cropping sesuai selection area
@@ -403,7 +404,7 @@ namespace CamObserver.Display
                 var ratioWidth = (double)SelectionArea.Width / ImgWidth;
                 var ratioHeight = (double)SelectionArea.Height / ImgHeight;
 
-                selectRect = new Rectangle((int)(ratioX * nextFrame.Width), (int)(ratioY * nextFrame.Height), (int)(ratioWidth * nextFrame.Width), (int)(ratioHeight * nextFrame.Height));
+                selectRect = new Rectangle((int)(ratioX * frameWidth), (int)(ratioY * frameHeight), (int)(ratioWidth * frameWidth), (int)(ratioHeight * frameHeight));
             }
 
             //var bmp = await yolo.Detect(resize.ToBitmap(), selectRect);
