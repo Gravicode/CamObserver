@@ -33,9 +33,9 @@ namespace CamObserver.Display.Helpers
         }
 
         public static Bitmap Draw(
-                    IReadOnlyList<ObjectInfo> results, Bitmap image, Tracker tracker)
+                    IReadOnlyList<ObjectInfo> results, Bitmap newBitmap, Tracker tracker)
         {
-            var newBitmap = (Bitmap)image.Clone();
+            //var newBitmap = (Bitmap)image.Clone();
             using (var graphics = Graphics.FromImage(newBitmap))
             {
                 foreach (var result in results)

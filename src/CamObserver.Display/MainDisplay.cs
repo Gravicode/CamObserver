@@ -70,9 +70,23 @@ namespace CamObserver.Display
 
         void Clear()
         {
-            PicBox1.Image = null;
+            if (InvokeRequired)
+            {
+                this.BeginInvoke((MethodInvoker)async delegate ()
+                {
+                    PicBox1.Image = null;
 
-            TxtInfo.Clear();
+                    TxtInfo.Clear();
+
+                });
+            }
+            else
+            {
+                PicBox1.Image = null;
+
+                TxtInfo.Clear();
+
+            }
         }
         void Setup()
         {
@@ -231,10 +245,12 @@ namespace CamObserver.Display
             PushTimer.Start();
             TxtInfo.AppendText("\nAuto sync is enabled.");
         }
-        ObjectDetectedArgs TempArgs;
-        Bitmap CaptureImage;
+        //ObjectDetectedArgs TempArgs;
+        //Bitmap CaptureImage;
+        Image RawImage;
         void Start()
         {
+
             source = new();
             BtnStart.Enabled = false;
             BtnStop.Enabled = true;
@@ -244,8 +260,41 @@ namespace CamObserver.Display
 
             objdet.ObjectDetected += (_, o) =>
             {
-                TempArgs = o;
-                ProcessWorker.RunWorkerAsync();
+                //TempArgs = o;
+                RawImage = (Image)o.NewImage.Clone();
+                o.NewImage.Dispose();
+                //if(!ProcessWorker.IsBusy)
+                //ProcessWorker.RunWorkerAsync();
+                //if (TempArgs == null) return;
+                //var o = TempArgs;
+                //var tempImg = (Image)o.NewImage?.Clone();
+                if (RawImage != null)
+                {
+                    if (InvokeRequired)
+                    {
+                        this.BeginInvoke((MethodInvoker)async delegate ()
+                        {
+                            //PicBox1.Image = o.NewImage;
+                            TxtInfo.Clear();
+                            foreach (var obj in o.DetectedObjects)
+                            {
+                                TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
+                            }
+                            DoTracking(o.DetectedObjects, RawImage, source.Token);
+                        });
+                    }
+                    else
+                    {
+                        //PicBox1.Image = o.NewImage;
+                        TxtInfo.Clear();
+                        foreach (var obj in o.DetectedObjects)
+                        {
+                            TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
+                        }
+                        DoTracking(o.DetectedObjects, RawImage, source.Token);
+                    }
+                    //tempImg.Dispose();
+                }
             };
 
             objdet.device = new();
@@ -254,6 +303,7 @@ namespace CamObserver.Display
 
             objdet.StartAnalysis();
             var task = Task.Run(() => UpdateStatLoop(source.Token));
+
 
         }
         bool CheckInternetConnection()
@@ -343,45 +393,16 @@ namespace CamObserver.Display
 
         private void ProcessWorker_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            if (TempArgs == null) return;
-            var o = TempArgs;
-            //var tempImg = (Image)o.NewImage?.Clone();
-            if (o.NewImage != null)
-            {
-                if (InvokeRequired)
-                {
-                    this.BeginInvoke((MethodInvoker)async delegate ()
-                    {
-                        //PicBox1.Image = o.NewImage;
-                        TxtInfo.Clear();
-                        foreach (var obj in o.DetectedObjects)
-                        {
-                            TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
-                        }
-                        DoTracking(o.DetectedObjects, o.NewImage, source.Token);
-                    });
-                }
-                else
-                {
-                    //PicBox1.Image = o.NewImage;
-                    TxtInfo.Clear();
-                    foreach (var obj in o.DetectedObjects)
-                    {
-                        TxtInfo.Text += $"label: {obj.Label}, score: {obj.Score}, pos: ({obj.P1.X},{obj.P1.Y}) - ({obj.P2.X},{obj.P2.Y})\n";
-                    }
-                    DoTracking(o.DetectedObjects, o.NewImage, source.Token);
-                }
-                //tempImg.Dispose();
-            }
+          
         }
 
         private void ProcessWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            this.Invoke((MethodInvoker)delegate
-            {
+            //this.Invoke((MethodInvoker)delegate
+            //{
 
-                PicBox1.Image = CaptureImage;
-            });
+            //    PicBox1.Image = CaptureImage;
+            //});
 
         }
 
@@ -389,13 +410,13 @@ namespace CamObserver.Display
             "bicycle", "person"
         };
 
-        async void DoTracking(List<ObjectInfo> results, Image nextFrame, CancellationToken token)
+        void DoTracking(List<ObjectInfo> results, Image nextFrame, CancellationToken token)
         {
             Rectangle selectRect = new Rectangle();
             if (IsCapturing) return;
             IsCapturing = true;
             var frameHeight = nextFrame.Height;
-            var frameWidth = nextFrame.Width;   
+            var frameWidth = nextFrame.Width;
             if (SelectionArea.Width > 0 && SelectionArea.Height > 0)
             {
                 // cropping sesuai selection area
@@ -415,14 +436,14 @@ namespace CamObserver.Display
             // draw tracker
             tracker.Process(filtered, selectRect);
             var bmp = DrawResults.Draw(filtered, (Bitmap)nextFrame, tracker);
-            CaptureImage = bmp;
-            /*
+            //CaptureImage = bmp;
+            
             this.PicBox1?.Invoke((MethodInvoker)delegate
             {
                 // Running on the UI thread
                 PicBox1.Image = bmp;
             });
-            */
+            
             watch.Stop();
             /*
             this.TxtStatus?.Invoke((MethodInvoker)delegate
