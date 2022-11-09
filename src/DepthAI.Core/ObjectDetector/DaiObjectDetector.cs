@@ -160,8 +160,18 @@ namespace DepthAI.Core
             // if not doing replay
             if (!device.replayResults)
             {
-                // Plugin lib pipeline results implementation
-                objectDetectorResults = Marshal.PtrToStringAnsi(ObjectDetectorResults(out frameInfo, GETPreview, detectionScoreThreshold, UseDepth, retrieveSystemInformation, useIMU, (int) device.deviceNum));
+                try
+                {
+                    // Plugin lib pipeline results implementation
+                    objectDetectorResults = Marshal.PtrToStringAnsi(ObjectDetectorResults(out frameInfo, GETPreview, detectionScoreThreshold, UseDepth, retrieveSystemInformation, useIMU, (int)device.deviceNum));
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    //objectDetectorResults = device.results;
+
+                }
             }
             // if replay read results from file
             else
