@@ -1,5 +1,6 @@
 ﻿using DepthAI.Core;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CamObserver.Display.Helpers
 {
-    
+    public record RecordedObject(long No, DateTime Waktu, string Jenis);
     public class TrackedObject
     {
         static Random rnd = new Random(Environment.TickCount);
@@ -41,28 +42,32 @@ namespace CamObserver.Display.Helpers
         public static int DistanceLimit = 100; //in pixel
         public static int TimeLimit = 5; //in seconds
         public List<TrackedObject> TrackedList;
-        DataTable table = new DataTable("counter");
+        ConcurrentBag<RecordedObject> table;
+        //DataTable table = new DataTable("counter");
         public Tracker()
         {
             TrackedList = new List<TrackedObject>();
+            table = new();
+            /*
             table.Columns.Add("No");
             table.Columns.Add("Waktu");
             table.Columns.Add("Jenis");
-            table.AcceptChanges();
+            table.AcceptChanges();*/
         }
         public void ClearLogTable()
         {
-            table.Rows.Clear();
+            table.Clear();
+            //table.Rows.Clear();
         }
-        public DataTable GetLogTable()
+        public List<RecordedObject> GetLogTable()
         {
-            return table;
+            return table.ToList();
         }
         public void SaveToLog()
         {
             
             string FileName = $"{Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)}/log_{DateTime.Now.ToString("yyyy_MM_dd")}.csv";
-            Logger.SaveAsCsv(table, FileName);
+            Logger.SaveAsCsv(table.ToList(), FileName);
         }
 
         public void Process(IReadOnlyList<ObjectInfo> Targets,Rectangle SelectArea)
@@ -108,12 +113,16 @@ namespace CamObserver.Display.Helpers
             {
                 if(SelectArea.Contains(new Point((int) item.Location.X, (int)item.Location.Y)) && !item.HasBeenCounted)
                 {
+                    /*
                     var newRow = table.NewRow();
                     newRow["No"] = table.Rows.Count + 1;
                     newRow["Waktu"] = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                     newRow["Jenis"] = item.Label;
                     table.Rows.Add(newRow);
-                    
+                    */
+                    var newRow = new RecordedObject(table.Count + 1, DateTime.Now, item.Label);
+                   
+                    table.Add(newRow);
                     item.HasBeenCounted = true;
                 }
             }

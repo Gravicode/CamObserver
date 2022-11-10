@@ -60,7 +60,7 @@ namespace CamObserver.Display
 
                 foreach (var fil in filter)
                 {
-                    var count = dt.AsEnumerable().Where(x => x.Field<string>("Jenis") == fil).Count();
+                    var count = dt.Where(x => x.Jenis == fil).Count();
                     AppConstants.InfoStat.Add(new ObjekStatistik() { Jumlah = count, No = row++, Objek = fil });
                 }
                 if (token.IsCancellationRequested) break;
@@ -317,6 +317,7 @@ namespace CamObserver.Display
             try
             {
                 var table = tracker.GetLogTable();
+                /*
                 if (table != null && table.Rows.Count > 0)
                 {
                     foreach (DataRow dr in table.Rows)
@@ -324,6 +325,24 @@ namespace CamObserver.Display
                         var newItem = new DataCounter();
                         newItem.Objek = dr["Jenis"].ToString();
                         newItem.Tanggal = Convert.ToDateTime(dr["Waktu"]);
+                        newItem.Aktivitas = "-";
+                        newItem.Tags = "-";
+                        newItem.FileUrl = "-";
+                        newItem.Deskripsi = "-";
+                        newItem.Lokasi = AppConstants.Lokasi;
+                        newItem.CCTV = AppConstants.CCTVName;
+                        var res = await dataCounterService.InsertData(newItem);
+                    }
+                    tracker.ClearLogTable();
+                    resultStr = $"Sync succeed at {DateTime.Now}";
+                }*/
+                if (table != null && table.Count > 0)
+                {
+                    foreach (var dr in table)
+                    {
+                        var newItem = new DataCounter();
+                        newItem.Objek = dr.Jenis;
+                        newItem.Tanggal = dr.Waktu;
                         newItem.Aktivitas = "-";
                         newItem.Tags = "-";
                         newItem.FileUrl = "-";
