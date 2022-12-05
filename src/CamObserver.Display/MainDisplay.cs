@@ -12,7 +12,11 @@ namespace CamObserver.Display
 {
     public partial class MainDisplay : Form
     {
+        //0 for false, 1 for true.
+        private static int usingResource = 0;
+        
         private System.Timers.Timer PushTimer;
+        private System.Timers.Timer PushImageTimer;
         int ImgHeight = 416, ImgWidth = 416;
         Point StartLocation;
         bool IsSelect = false;
@@ -90,6 +94,29 @@ namespace CamObserver.Display
         }
         HttpClient client = new();
         const string PushImageApiUrl = "https://camobserver.my.id/api/cctv/sendimage";
+        static byte[] CloudImage;
+        bool AddCloudImage(byte[] ImgData)
+        {
+            //0 indicates that the method is not in use.
+            if (0 == Interlocked.Exchange(ref usingResource, 1))
+            {
+                Console.WriteLine("{0} acquired the lock", Thread.CurrentThread.Name);
+
+                CloudImage = ImgData;
+
+                Console.WriteLine("{0} exiting lock", Thread.CurrentThread.Name);
+
+                //Release the lock
+                Interlocked.Exchange(ref usingResource, 0);
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("{0} was denied the lock", Thread.CurrentThread.Name);
+                return false;
+            }
+        }
+        
         async Task<bool> PushImageToCloud(string CctvName, byte[] ImageData)
         {
             try
@@ -274,6 +301,52 @@ namespace CamObserver.Display
             };
             PushTimer.Start();
             TxtInfo.AppendText("\nAuto sync is enabled.");
+            ChkPushToCloud.Click += async(a, b) => {
+                if (PushImageTimer == null)
+                {
+                    PushImageTimer = new();
+                    PushImageTimer.Interval = AppConstants.ImageSyncDelay;
+                    TxtInfo.Text += $"Image Sync Time: {(float)AppConstants.ImageSyncDelay / 1000} seconds";
+                    PushImageTimer.Elapsed += async (a, b) =>
+                    {
+                        try
+                        {
+                            PushImageTimer.Stop();
+                            if (!CheckInternetConnection())
+                            {
+                                if (InvokeRequired)
+                                {
+                                    this.BeginInvoke((MethodInvoker)async delegate ()
+                                    {
+                                        TxtStatus.Text = ("Internet connection not available, cancel sync image data...");
+                                    });
+                                }
+                                else
+                                {
+                                    TxtStatus.Text = ("Internet connection not available, cancel sync image data...");
+                                }
+
+                            }
+                            else
+                            {
+                                if (ChkPushToCloud.Checked && CloudImage != null)
+                                {
+                                    await PushImageToCloud("cctv-1", CloudImage);
+                                    AddCloudImage(null);
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            PushImageTimer.Start();
+                        }
+                    };
+                }
+                if (ChkPushToCloud.Checked)
+                    PushImageTimer.Start();
+                else
+                    PushImageTimer.Stop();
+            };
         }
         //ObjectDetectedArgs TempArgs;
         //Bitmap CaptureImage;
@@ -466,7 +539,7 @@ namespace CamObserver.Display
             "bicycle", "person"
         };
 
-        async void DoTracking(List<ObjectInfo> results, Image nextFrame, CancellationToken token)
+        void DoTracking(List<ObjectInfo> results, Image nextFrame, CancellationToken token)
         {
             Rectangle selectRect = new Rectangle();
             if (IsCapturing) return;
@@ -501,7 +574,7 @@ namespace CamObserver.Display
             });
             if (ChkPushToCloud.Checked)
             {
-                await PushImageToCloud($"cctv-1", ImageToByte2(bmp));
+                AddCloudImage(ImageToByte2(bmp));
             }
             watch.Stop();
             /*
