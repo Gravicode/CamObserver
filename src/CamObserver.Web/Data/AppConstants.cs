@@ -32,6 +32,7 @@ namespace CamObserver.Web.Data
         //public static string? CheckQRUrl { get; set; }
         public static string? DefaultPass { get; set; } = "123qweasd";
         public static string? ReportPeopleCounter { get; set; }
+        public static string? ReportWeather { get; set; }
 
        
         

@@ -68,6 +68,7 @@ AppConstants.BlobConn = Configuration["ConnectionStrings:BlobConn"];
 AppConstants.GMapApiKey = Configuration["GmapKey"];
 
 AppConstants.ReportPeopleCounter = Configuration["Reports:ReportPeopleCounter"];
+AppConstants.ReportWeather = Configuration["Reports:ReportWeather"];
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
