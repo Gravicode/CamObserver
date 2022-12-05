@@ -118,7 +118,12 @@ namespace CamObserver.Display
 
             var manager = new OAKDeviceManager();
             ListDevice = manager.GetAvailableDevices();
-
+            if (!ListDevice.Any())
+            {
+                MessageBox.Show("Camera OAK tidak ditemukan, silakan periksa kembali kameranya.");
+                Application.Exit();
+                return;
+            }
             dataCounterService = ObjectContainer.Get<DataCounterService>();
 
             tracker = new Tracker();
@@ -275,11 +280,18 @@ namespace CamObserver.Display
         Image RawImage;
         void Start()
         {
-
+            if (!ListDevice.Any())
+            {
+                var ErrMsg = "Camera OAK tidak ditemukan, tidak bisa mulai.";
+                TxtInfo.Text = ErrMsg;
+                Console.WriteLine(ErrMsg);
+                return;
+            }
             source = new();
             BtnStart.Enabled = false;
             BtnStop.Enabled = true;
             Clear();
+            
             var device = ListDevice.First();
             objdet = new();
 
