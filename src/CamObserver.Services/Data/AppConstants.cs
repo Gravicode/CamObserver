@@ -24,7 +24,7 @@ namespace CamObserver.Data
         public static string BlobConn { get; set; }
        
         public static string? DefaultPass { get; set; } = "123qweasd";
-        public static string? LaporanUbUrl { get; set; }
+        public static string? ReportPeopleCounter { get; set; }
 
        
         

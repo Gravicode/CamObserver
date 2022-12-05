@@ -51,7 +51,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcServer", "GrpcServer\Gr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcClient", "GrpcClient\GrpcClient.csproj", "{929B5405-3DDA-4ABE-88D6-32F2E6DD79DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CamObserver.Display", "CamObserver.Display\CamObserver.Display.csproj", "{7EFE6001-164D-42C6-9C12-2F3C7258A0BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CamObserver.Display", "CamObserver.Display\CamObserver.Display.csproj", "{7EFE6001-164D-42C6-9C12-2F3C7258A0BE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DepthAI.Core", "DepthAI.Core\DepthAI.Core.csproj", "{AE5C3B73-A0EC-46EA-B2F2-C4692D1D25E9}"
 EndProject

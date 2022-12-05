@@ -77,6 +77,7 @@ void ConfigureServices(IServiceCollection services, IConfiguration Configuration
     AppConstants.SQLConn = Configuration["ConnectionStrings:SqlConn"];
     AppConstants.RedisCon = Configuration["RedisCon"];
     AppConstants.BlobConn = Configuration["BlobConn"];
+    AppConstants.ReportPeopleCounter = Configuration["Reports:ReportPeopleCounter"];
 
     MailService.MailUser = Configuration["MailSettings:MailUser"];
     MailService.MailPassword = Configuration["MailSettings:MailPassword"];

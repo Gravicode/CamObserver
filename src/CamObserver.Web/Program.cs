@@ -9,6 +9,7 @@ using CamObserver.Web.Helpers;
 using System.Net;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
+using ServiceStack.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -62,11 +63,11 @@ var configBuilder = new ConfigurationBuilder()
 IConfiguration Configuration = configBuilder.Build();
 
 AppConstants.SQLConn = Configuration["ConnectionStrings:SqlConn"];
-AppConstants.RedisCon = Configuration["RedisCon"];
+AppConstants.RedisCon = Configuration["ConnectionStrings:RedisCon"];
 AppConstants.BlobConn = Configuration["ConnectionStrings:BlobConn"];
 AppConstants.GMapApiKey = Configuration["GmapKey"];
 
-AppConstants.LaporanStatistikUrl = Configuration["Reports:LaporanStatistikUrl"];
+AppConstants.ReportPeopleCounter = Configuration["Reports:ReportPeopleCounter"];
 
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredToast();
@@ -83,7 +84,7 @@ MailService.UseSendGrid = true;
 SmsService.UserKey = Configuration["SmsSettings:ZenzivaUserKey"];
 SmsService.PassKey = Configuration["SmsSettings:ZenzivaPassKey"];
 SmsService.TokenKey = Configuration["SmsSettings:TokenKey"];
-
+builder.Services.AddSingleton(new RedisManagerPool(AppConstants.RedisCon));
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {

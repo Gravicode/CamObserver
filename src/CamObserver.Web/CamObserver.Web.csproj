@@ -7,6 +7,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="SkiaSharp" Version="2.88.3" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.3" />
+		<PackageReference Include="ServiceStack.Redis.Core" Version="6.4.0" />
 		<PackageReference Include="BlazorInputFile" Version="0.1.0-preview-00002" />
 		<PackageReference Include="MudBlazor" Version="6.0.9" />
 		<PackageReference Include="GoogleMaps.LocationServices" Version="1.2.0.2" />

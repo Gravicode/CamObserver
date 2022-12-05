@@ -88,6 +88,31 @@ namespace CamObserver.Display
 
             }
         }
+        HttpClient client = new();
+        const string PushImageApiUrl = "https://camobserver.my.id/api/cctv/sendimage";
+        async Task<bool> PushImageToCloud(string CctvName, byte[] ImageData)
+        {
+            try
+            {
+                var info = new CCTVImage() { CctvName = CctvName, ImageBytes = ImageData, CreatedDate = DateTime.Now };
+                var json = System.Text.Json.JsonSerializer.Serialize(info);
+                var hasil = await client.PostAsync(PushImageApiUrl, new StringContent(json, System.Text.Encoding.UTF8, "application/json"));
+                if (hasil.IsSuccessStatusCode)
+                {
+                    Console.WriteLine($"{DateTime.Now} => push image dari {CctvName} sukses");
+                    return true;
+                }
+                else
+                {
+                    Console.WriteLine($"{DateTime.Now} => push image dari {CctvName} gagal, {await hasil.Content.ReadAsStringAsync()}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+            return false;
+        }
         void Setup()
         {
 
@@ -429,7 +454,7 @@ namespace CamObserver.Display
             "bicycle", "person"
         };
 
-        void DoTracking(List<ObjectInfo> results, Image nextFrame, CancellationToken token)
+        async void DoTracking(List<ObjectInfo> results, Image nextFrame, CancellationToken token)
         {
             Rectangle selectRect = new Rectangle();
             if (IsCapturing) return;
@@ -462,7 +487,10 @@ namespace CamObserver.Display
                 // Running on the UI thread
                 PicBox1.Image = bmp;
             });
-            
+            if (ChkPushToCloud.Checked)
+            {
+                await PushImageToCloud($"cctv-1", ImageToByte2(bmp));
+            }
             watch.Stop();
             /*
             this.TxtStatus?.Invoke((MethodInvoker)delegate
@@ -478,6 +506,14 @@ namespace CamObserver.Display
             }
 
             IsCapturing = false;
+        }
+        public static byte[] ImageToByte2(Image img)
+        {
+            using (var stream = new MemoryStream())
+            {
+                img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                return stream.ToArray();
+            }
         }
     }
 }
