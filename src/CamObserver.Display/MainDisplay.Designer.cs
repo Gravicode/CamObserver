@@ -45,39 +45,37 @@
             // 
             // blazorWebView1
             // 
-            this.blazorWebView1.Location = new System.Drawing.Point(613, 15);
+            this.blazorWebView1.Location = new System.Drawing.Point(221, 12);
             this.blazorWebView1.Name = "blazorWebView1";
-            this.blazorWebView1.Size = new System.Drawing.Size(536, 416);
+            this.blazorWebView1.Size = new System.Drawing.Size(405, 386);
             this.blazorWebView1.TabIndex = 0;
             this.blazorWebView1.Text = "blazorWebView1";
             // 
             // TxtInfo
             // 
-            this.TxtInfo.Location = new System.Drawing.Point(12, 350);
+            this.TxtInfo.Location = new System.Drawing.Point(12, 416);
             this.TxtInfo.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.TxtInfo.Name = "TxtInfo";
-            this.TxtInfo.Size = new System.Drawing.Size(588, 72);
+            this.TxtInfo.Size = new System.Drawing.Size(614, 102);
             this.TxtInfo.TabIndex = 8;
             this.TxtInfo.Text = "";
             // 
             // PicBox1
             // 
             this.PicBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.PicBox1.Location = new System.Drawing.Point(1155, 15);
+            this.PicBox1.Location = new System.Drawing.Point(648, 11);
             this.PicBox1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.PicBox1.Name = "PicBox1";
-            this.PicBox1.Size = new System.Drawing.Size(423, 416);
+            this.PicBox1.Size = new System.Drawing.Size(666, 589);
             this.PicBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.PicBox1.TabIndex = 5;
             this.PicBox1.TabStop = false;
             // 
             // BtnSync
             // 
-            this.BtnSync.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnSync.Location = new System.Drawing.Point(12, 239);
+            this.BtnSync.Location = new System.Drawing.Point(13, 281);
             this.BtnSync.Name = "BtnSync";
-            this.BtnSync.Size = new System.Drawing.Size(270, 50);
+            this.BtnSync.Size = new System.Drawing.Size(196, 50);
             this.BtnSync.TabIndex = 22;
             this.BtnSync.Text = "Sync to Clou&d";
             this.BtnSync.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -87,11 +85,9 @@
             // 
             // BtnSave
             // 
-            this.BtnSave.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnSave.Location = new System.Drawing.Point(12, 183);
+            this.BtnSave.Location = new System.Drawing.Point(13, 215);
             this.BtnSave.Name = "BtnSave";
-            this.BtnSave.Size = new System.Drawing.Size(270, 50);
+            this.BtnSave.Size = new System.Drawing.Size(196, 50);
             this.BtnSave.TabIndex = 20;
             this.BtnSave.Text = "Save &Log";
             this.BtnSave.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -101,11 +97,9 @@
             // 
             // BtnOpen
             // 
-            this.BtnOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnOpen.Location = new System.Drawing.Point(12, 127);
+            this.BtnOpen.Location = new System.Drawing.Point(13, 148);
             this.BtnOpen.Name = "BtnOpen";
-            this.BtnOpen.Size = new System.Drawing.Size(270, 50);
+            this.BtnOpen.Size = new System.Drawing.Size(196, 50);
             this.BtnOpen.TabIndex = 21;
             this.BtnOpen.Text = "&Open File (Dev only)";
             this.BtnOpen.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -115,11 +109,9 @@
             // 
             // BtnStop
             // 
-            this.BtnStop.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnStop.Location = new System.Drawing.Point(12, 71);
+            this.BtnStop.Location = new System.Drawing.Point(13, 81);
             this.BtnStop.Name = "BtnStop";
-            this.BtnStop.Size = new System.Drawing.Size(270, 50);
+            this.BtnStop.Size = new System.Drawing.Size(196, 50);
             this.BtnStop.TabIndex = 24;
             this.BtnStop.Text = "S&top";
             this.BtnStop.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -129,11 +121,9 @@
             // 
             // BtnStart
             // 
-            this.BtnStart.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnStart.Location = new System.Drawing.Point(12, 15);
+            this.BtnStart.Location = new System.Drawing.Point(13, 12);
             this.BtnStart.Name = "BtnStart";
-            this.BtnStart.Size = new System.Drawing.Size(270, 50);
+            this.BtnStart.Size = new System.Drawing.Size(196, 50);
             this.BtnStart.TabIndex = 23;
             this.BtnStart.Text = "&Start";
             this.BtnStart.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -147,9 +137,9 @@
             this.TxtStatus.FontSize = MetroFramework.MetroLabelSize.Tall;
             this.TxtStatus.FontWeight = MetroFramework.MetroLabelWeight.Bold;
             this.TxtStatus.ForeColor = System.Drawing.SystemColors.WindowText;
-            this.TxtStatus.Location = new System.Drawing.Point(7, 457);
+            this.TxtStatus.Location = new System.Drawing.Point(7, 573);
             this.TxtStatus.Name = "TxtStatus";
-            this.TxtStatus.Size = new System.Drawing.Size(1571, 27);
+            this.TxtStatus.Size = new System.Drawing.Size(619, 27);
             this.TxtStatus.TabIndex = 25;
             this.TxtStatus.Text = "Cam Observer v0.1";
             this.TxtStatus.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -157,11 +147,9 @@
             // 
             // BtnConfig
             // 
-            this.BtnConfig.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnConfig.Location = new System.Drawing.Point(12, 295);
+            this.BtnConfig.Location = new System.Drawing.Point(13, 348);
             this.BtnConfig.Name = "BtnConfig";
-            this.BtnConfig.Size = new System.Drawing.Size(270, 50);
+            this.BtnConfig.Size = new System.Drawing.Size(196, 50);
             this.BtnConfig.TabIndex = 26;
             this.BtnConfig.Text = "Save &Config";
             this.BtnConfig.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -177,7 +165,7 @@
             // ChkPushToCloud
             // 
             this.ChkPushToCloud.AutoSize = true;
-            this.ChkPushToCloud.Location = new System.Drawing.Point(12, 427);
+            this.ChkPushToCloud.Location = new System.Drawing.Point(12, 543);
             this.ChkPushToCloud.Name = "ChkPushToCloud";
             this.ChkPushToCloud.Size = new System.Drawing.Size(137, 19);
             this.ChkPushToCloud.TabIndex = 27;
@@ -188,7 +176,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1600, 582);
+            this.ClientSize = new System.Drawing.Size(1375, 689);
             this.Controls.Add(this.ChkPushToCloud);
             this.Controls.Add(this.BtnConfig);
             this.Controls.Add(this.TxtStatus);

@@ -539,11 +539,6 @@ namespace CamObserver.Display
             "bicycle", "person"
         };
 
-        private void blazorWebView1_Click(object sender, EventArgs e)
-        {
-
-        }
-
         void DoTracking(List<ObjectInfo> results, Image nextFrame, CancellationToken token)
         {
             Rectangle selectRect = new Rectangle();
